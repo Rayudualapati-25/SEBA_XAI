@@ -1,0 +1,109 @@
+\section{Proposed Methodology}
+
+\subsection{System View}
+
+The proposed system is a research prototype and benchmark. It is not presented
+as a production deployment. The design has four main parts: an access request
+gateway, a layered access-control service, an explainable decision service, and
+a permissioned blockchain-style audit layer. Raw records remain in
+agency-controlled off-chain storage. The audit layer stores only identifiers,
+commitments, hashes, policy versions, approval references, explanation hashes,
+and block metadata.
+
+\subsection{Access Request Flow}
+
+The workflow begins when a user requests a sensitive record. The user may be a
+police officer, an investigating agency user, a forensic user, a prosecutor or
+court-related authority, or an auditor. The gateway converts the request into a
+structured form. Subject attributes include role, rank, station, jurisdiction,
+credential status, and case assignment. Object attributes include record type,
+sensitivity level, juvenile or witness flags, sealed status, and owning agency.
+Action attributes describe what the requester wants to do. Environment
+attributes include purpose, time window, emergency flag, court/prosecutor link,
+approval token, and policy version.
+
+The access-control service evaluates these attributes and returns
+\emph{allow}, \emph{deny}, or \emph{escalate}. A request can be allowed when
+the requester has the required role, assignment, purpose, and approval context.
+It can be denied when the credential is revoked, the approval is invalid, or
+the request clearly violates policy. It can be escalated when a superior or
+review authority must check the request, such as in cross-jurisdiction or
+sensitive-record cases.
+
+\subsection{Policy Layer}
+
+The policy layer combines RBAC, ABAC, and PBAC-style rules. RBAC gives the
+basic user categories. ABAC adds contextual attributes such as jurisdiction,
+case assignment, purpose, sensitivity, and credential state. PBAC adds policy
+versioning, approval requirements, revocation handling, and exceptional cases.
+The current prototype uses a deterministic policy oracle because the first
+paper needs transparent benchmark labels. This is more suitable than a black
+box model for the initial access decision.
+
+\subsection{Explainable Decision Layer}
+
+After a decision is made, the XAI layer creates an explanation artifact. The
+artifact contains the decision label, reason code, decisive attributes, policy
+or rule version, counterfactual information where applicable, and an
+explanation hash. A typical explanation answers a direct question: why was this
+request allowed, denied, or escalated?
+
+This layer is designed for review, not only for display. A supervisor can use
+it to inspect an escalation. An auditor can use it to check whether the policy
+and explanation match. A court-related or administrative reviewer can use it to
+understand what information was considered at the time of access. The
+explanation hash is linked to the audit event so that a later change in the
+explanation can be detected.
+
+\subsection{Blockchain-Style Audit Layer}
+
+The audit layer is modeled as a permissioned blockchain-style ledger among
+known agencies. Each audit event stores minimized metadata and commitments
+rather than raw sensitive records. A block contains a batch of events, a
+previous-block hash, an event commitment, validator identity, and signature.
+The design is compared with simpler baselines such as a mutable log and a
+signed append-only hash chain. This comparison is important because blockchain
+should not be assumed to help unless it is tested against simpler audit
+mechanisms.
+
+\subsection{Synthetic Benchmark}
+
+Real police access logs are not publicly available, and they should not be
+assumed in a first-stage academic prototype. The benchmark therefore generates
+synthetic stations, officers, cases, records, and access requests. The declared
+policy oracle labels each request as allow, deny, or escalate. The synthetic
+setting gives control over request context, policy stress cases, and attack
+conditions. It does not claim to represent real CCTNS or ICJS traffic.
+
+\subsection{Threat Model and Evaluation}
+
+The attack catalog includes ordinary tampering, approval-token replay, request
+backdating, explanation-hash substitution, revocation-race behavior,
+metadata-inference checks, block-signature collusion, and the validly re-signed
+compromised-signer attack. The compromised-signer case is important because an
+attacker may corrupt the policy output and then produce a log that still looks
+properly signed. This separates integrity of the log from correctness of the
+decision.
+
+The evaluation compares mutable logs, signed hash chains, blockchain-style
+audit, CT-style logs, ABAC/Fabric-style re-execution, a trusted raw-attribute
+policy oracle, and NS-PI log-only drift detection. The research questions are:
+
+\begin{itemize}
+    \item RQ1: Which audit designs detect ordinary tamper attacks?
+    \item RQ2: Which defenses detect validly re-signed policy corruption?
+    \item RQ3: What are the sensitivity limits of NS-PI drift detection?
+    \item RQ4: How complete and stable are the XAI artifacts and audit
+    reconstruction traces?
+    \item RQ5: What metadata exposure and local latency/storage overhead are
+    introduced by the audit design?
+\end{itemize}
+
+The metrics include adversarial audit score, per-attack detection rate,
+trace-completeness rate, decisive-attribute coverage, counterfactual coverage,
+counterfactual validity, explanation stability, audit reconstruction rate,
+metadata exposure score, decision/build latency, verification latency, and
+storage overhead. The experiments are run with deterministic seeds
+\{7, 21, 42, 99, 123\}. The paper reports results only from generated
+artifacts in the repository and does not infer real police-system performance
+from the synthetic workload.

@@ -1,0 +1,50 @@
+.DS_Store
+**/.DS_Store
+~$*.xlsx
+
+# Python build / cache artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Virtual envs
+.venv/
+venv/
+env/
+
+# Editor
+.vscode/
+.idea/
+
+# Generated / reproducible deliverables (rebuild via scripts/)
+#   pdf_exports/                  -> scripts/create_all_in_one_pdf.py
+#   professor_ready_documents/    -> scripts/generate_professor_ready_documents.py
+#   research_documents/           -> scripts/generate_curated_research_documents.py
+#   professor_share_research_only_2026-05-29/ -> scripts/create_professor_share_research_only.py
+#   spreadsheets/                 -> scripts/create_*_spreadsheet.py
+pdf_exports/
+professor_ready_documents/
+research_documents/
+professor_share_research_only_*/
+spreadsheets/
+
+# Downloaded literature corpus (large PDFs; reference material, not source)
+all_research_papers_*/
+downloaded_research_papers_*/
+sources/downloaded_research_papers_*/
+sources/reference_papers/*.pdf
+**/failed_direct_downloads_html/
+*_attempt*.html
+
+# Rebuildable raw prototype run folders. Keep summarized results in results/
+# and run metadata in experiments/runs/.
+prototype/runs/*
+!prototype/runs/README.md

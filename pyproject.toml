@@ -1,0 +1,91 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "seba"
+version = "0.1.0"
+description = "SEBA-XAI: Secure Explainable Blockchain-Audited Access Overlay + NS-PI neuro-symbolic policy induction"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Venkata Rayudu Alapati", email = "alapativenkatarayudu@gmail.com" },
+]
+keywords = [
+  "access-control", "abac", "audit-log", "blockchain", "xai",
+  "rule-learning", "neuro-symbolic", "police-informatics",
+]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Topic :: Security",
+  "Topic :: Scientific/Engineering",
+  "Intended Audience :: Science/Research",
+]
+
+dependencies = [
+  "numpy>=1.26,<3.0",
+  "pandas>=2.1,<3.0",
+  "scikit-learn>=1.4,<2.0",
+  "scipy>=1.11,<2.0",
+  "imodels>=1.4,<2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0,<9.0",
+  "pytest-cov>=4.1,<6.0",
+  "ruff>=0.4,<1.0",
+  "mypy>=1.8,<2.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/RayuduAlapati/seba-xai"
+Repository = "https://github.com/RayuduAlapati/seba-xai"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["seba*"]
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["tests"]
+markers = [
+  "unit: fast pure-function tests",
+  "integration: tests that read run artifacts from prototype/runs/",
+  "slow: tests that run the full pipeline",
+]
+
+[tool.coverage.run]
+source = ["src/seba"]
+branch = true
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+fail_under = 60
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM", "PL"]
+ignore = ["PLR0913", "PLR2004"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = true
+ignore_missing_imports = true

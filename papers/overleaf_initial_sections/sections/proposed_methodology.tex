@@ -1,0 +1,91 @@
+\section{Proposed Methodology}
+
+This section describes the initial methodology for SEBA-XAI. The methodology is written as a research prototype and benchmark design, not as a production deployment plan. The goal is to make the architecture measurable before claiming operational usefulness.
+
+\subsection{Design Principles}
+
+SEBA-XAI is based on five design principles:
+\begin{enumerate}
+    \item \textit{Complement existing infrastructure:} The overlay is designed to work above CCTNS/ICJS-style systems rather than replace them.
+    \item \textit{Keep raw records off-chain:} Sensitive records remain in agency-controlled storage. The ledger stores commitments, identifiers, and audit metadata only.
+    \item \textit{Separate authorization from audit:} Access decisions are made by a policy layer. The blockchain-style layer records tamper-evident evidence of the decision.
+    \item \textit{Make explanations auditable:} XAI outputs are stored as structured artifacts and bound to audit events through hashes.
+    \item \textit{Use reproducible synthetic evaluation:} Since real police access logs are not publicly available, the first benchmark uses synthetic requests with controlled policies and attacks.
+\end{enumerate}
+
+\subsection{System Actors and Components}
+
+The proposed system contains the following actors: requesting officer, owning police station or agency, reviewing superior, external criminal-justice agency user, policy administrator, and auditor. The technical components are:
+
+\begin{itemize}
+    \item \textit{Access request gateway:} Receives a request for a record and normalizes it into subject, object, action, and environment attributes.
+    \item \textit{Policy decision layer:} Applies RBAC, ABAC, and PBAC-style rules to return an allow, deny, or escalate decision.
+    \item \textit{XAI layer:} Generates reason codes, decisive attributes, and counterfactual-style explanations where applicable.
+    \item \textit{Off-chain record store:} Keeps raw sensitive records outside the ledger under agency control.
+    \item \textit{Permissioned audit layer:} Stores tamper-evident commitments for requests, policies, approvals, model/rule versions, record hashes, and explanation hashes.
+    \item \textit{Audit review module:} Reconstructs the decision path and checks whether the request, policy, explanation, and audit event remain consistent.
+\end{itemize}
+
+\subsection{Access Request Workflow}
+
+The access workflow begins when an officer or agency user requests a record. The gateway validates the requester's identity and extracts the relevant attributes. These include role, rank, station, jurisdiction, case assignment, credential status, requested action, purpose of access, record sensitivity, juvenile/witness flags, sealed-record status, approval token, emergency flag, court/prosecutor connection, and policy version.
+
+The policy decision layer evaluates these attributes. A low-risk request by an assigned officer for an ordinary case record may be allowed. A revoked credential, expired approval token, or unauthorized sealed-record request may be denied. A cross-jurisdiction request, juvenile/witness-sensitive record, or classified record may be escalated to a superior. The XAI layer then records why the decision was made. For example, the explanation may state that a request was escalated because the record was classified and the requester was outside the owning jurisdiction.
+
+After the decision, the system writes an audit event. The raw record is not copied to the blockchain. Instead, the audit event stores minimized metadata and commitments, such as request ID, policy ID, decision hash, explanation hash, approval event ID, and record commitment. If the request is allowed, the requester receives a controlled pointer or access token to retrieve the off-chain record through the owning agency's access mechanism.
+
+\subsection{Policy Model}
+
+The policy model combines RBAC, ABAC, and PBAC. RBAC provides basic role categories such as investigating officer, station officer, forensic user, prosecutor, court-linked user, and auditor. ABAC adds contextual attributes such as jurisdiction, case assignment, record sensitivity, credential status, time window, and purpose. PBAC adds policy versioning, approval requirements, revocation state, and exceptional handling.
+
+The first-stage prototype uses deterministic rules because the aim is to make the benchmark transparent. A deterministic policy oracle is easier to audit than a black-box model and follows the high-stakes AI recommendation to prefer interpretable models where feasible \cite{rudin_2019}. Later versions may add learned risk scoring, but the baseline access decision should remain policy-grounded.
+
+\subsection{Blockchain Audit Layer}
+
+The audit layer is modeled as a permissioned blockchain-style ledger. The intended deployment assumption is a consortium of known agencies, not an anonymous public blockchain. This matches the permissioned-blockchain direction supported by Hyperledger Fabric \cite{androulaki_fabric_2018}. Each block records a batch of audit events. Each event contains hashes and metadata rather than raw records. The block header contains a previous block hash, timestamp, Merkle-style event commitment, validator identity, and signature.
+
+The audit layer is evaluated against simpler baselines such as a mutable log and a signed append-only hash chain. This comparison is necessary because blockchain should not be assumed to be useful without a baseline. The expected value of the permissioned audit layer is stronger cross-agency tamper evidence, clearer provenance, and support for independent audit reconstruction.
+
+\subsection{XAI Artifact Layer}
+
+For each decision, the XAI layer emits a structured explanation artifact. The artifact includes:
+
+\begin{itemize}
+    \item decision label: allow, deny, or escalate;
+    \item reason code;
+    \item decisive subject, object, action, and environment attributes;
+    \item policy version;
+    \item model or rule version;
+    \item counterfactual information where applicable;
+    \item explanation hash linked to the audit event.
+\end{itemize}
+
+The purpose of this layer is not merely to make the interface easier to read. The purpose is auditability. A reviewer should be able to inspect whether the explanation matches the policy, whether the same request context gives a stable decision, and whether the explanation hash matches the recorded audit event.
+
+\subsection{Synthetic Benchmark Design}
+
+The benchmark generates synthetic police stations, officers, cases, records, and access requests. Each request is labeled by the declared policy oracle as allow, deny, or escalate. The synthetic setting is used because actual police records and access logs are sensitive and not publicly available. This avoids unsupported claims while still allowing repeatable experiments.
+
+The benchmark includes normal requests and policy-stress scenarios such as cross-jurisdiction sensitive access, revoked credentials, stale case assignment, juvenile/witness records, sealed records, emergency access, court/prosecutor requests, and expired approval tokens. Each scenario is designed to test a different part of the policy and explanation workflow.
+
+\subsection{Threat and Evaluation Model}
+
+The initial threat model includes ordinary tampering, replay of approval tokens, request backdating, explanation-hash substitution, revocation races, metadata-inference risk, collusion-style block signature manipulation, and compromised-signer behavior. A compromised signer is especially important because a validly re-signed malicious log may pass simple integrity checks. This motivates comparing ledger-only detection with policy re-execution and interpretable drift detection.
+
+The evaluation should report at least the following metrics:
+\begin{itemize}
+    \item audit reconstruction success;
+    \item tamper detection rate;
+    \item false allow and false deny behavior;
+    \item escalation correctness;
+    \item explanation completeness and decisive-attribute coverage;
+    \item explanation stability under duplicate contexts;
+    \item counterfactual coverage and validity;
+    \item ledger write and verification latency;
+    \item storage overhead;
+    \item metadata exposure score.
+\end{itemize}
+
+\subsection{Methodology Boundary}
+
+The proposed methodology does not assume access to live CCTNS or ICJS systems. It does not use actual police records. It does not prove legal compliance or deployment readiness. The first goal is to create a controlled, reproducible research benchmark that can show whether the integration of policy enforcement, blockchain-style audit, and XAI artifacts is technically measurable and defensible.

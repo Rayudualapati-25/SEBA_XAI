@@ -1,0 +1,272 @@
+{
+  "policy_version": "P-2026-05-CONFIG-V1",
+  "policy_name": "SEBA-XAI configured PBAC/ABAC policy for synthetic access requests",
+  "scope": "Synthetic research prototype only. This is not a legal, operational, CCTNS, or ICJS production policy.",
+  "decision_precedence": [
+    "deny",
+    "escalate",
+    "allow"
+  ],
+  "sensitive_levels": [
+    "HIGH",
+    "CLASSIFIED"
+  ],
+  "privacy_flags": [
+    "juvenile_flag",
+    "victim_flag",
+    "witness_flag"
+  ],
+  "allowed_purposes": [
+    "INVESTIGATION",
+    "SUPERVISION",
+    "FORENSIC_REVIEW",
+    "PROSECUTION_REVIEW",
+    "COURT_PRODUCTION",
+    "AUDIT",
+    "EMERGENCY_RESPONSE"
+  ],
+  "routine_actions": [
+    "VIEW",
+    "DOWNLOAD"
+  ],
+  "role_actions": {
+    "Constable": [
+      "VIEW"
+    ],
+    "Head Constable": [
+      "VIEW"
+    ],
+    "Sub-Inspector": [
+      "VIEW",
+      "DOWNLOAD"
+    ],
+    "Inspector": [
+      "VIEW",
+      "DOWNLOAD",
+      "UPDATE"
+    ],
+    "Station House Officer": [
+      "VIEW",
+      "DOWNLOAD",
+      "UPDATE",
+      "SHARE",
+      "APPROVE"
+    ],
+    "Cybercrime Officer": [
+      "VIEW",
+      "DOWNLOAD",
+      "UPDATE",
+      "SHARE"
+    ],
+    "Forensic Officer": [
+      "VIEW",
+      "DOWNLOAD",
+      "UPDATE"
+    ],
+    "Prosecutor Liaison": [
+      "VIEW",
+      "DOWNLOAD",
+      "SHARE"
+    ],
+    "Senior Superintendent": [
+      "VIEW",
+      "DOWNLOAD",
+      "UPDATE",
+      "SHARE",
+      "APPROVE"
+    ]
+  },
+  "thresholds": {
+    "supervisor_min_rank": 5,
+    "sensitive_update_min_rank": 4
+  },
+  "rule_groups": {
+    "credential": {
+      "description": "Checks whether the requester credential is active.",
+      "rule_ids": [
+        "DENY_INACTIVE_CREDENTIAL"
+      ]
+    },
+    "approval": {
+      "description": "Checks approval-token expiry, classified sharing, and missing approval for sensitive records.",
+      "rule_ids": [
+        "DENY_EXPIRED_APPROVAL_TOKEN",
+        "DENY_CLASSIFIED_SHARE_WITHOUT_VALID_APPROVAL",
+        "ESCALATE_CLASSIFIED_RECORD_APPROVAL_REQUIRED",
+        "ESCALATE_MISSING_APPROVAL_FOR_SENSITIVE_RECORD"
+      ]
+    },
+    "assignment": {
+      "description": "Checks stale case assignment and uses assignment in routine allow logic.",
+      "rule_ids": [
+        "DENY_STALE_CASE_ASSIGNMENT"
+      ]
+    },
+    "sealed_record": {
+      "description": "Checks sealed records and court/prosecution context.",
+      "rule_ids": [
+        "DENY_SEALED_RECORD_WITHOUT_COURT_CONTEXT",
+        "ESCALATE_SEALED_RECORD_REVIEW_REQUIRED"
+      ]
+    },
+    "purpose": {
+      "description": "Checks recognized purpose and blocks training purpose on sensitive records.",
+      "rule_ids": [
+        "DENY_TRAINING_PURPOSE_FOR_SENSITIVE_RECORD"
+      ]
+    },
+    "action_rank": {
+      "description": "Checks supervisor rank for approval action and rank for sensitive updates.",
+      "rule_ids": [
+        "DENY_APPROVAL_ACTION_WITHOUT_SUPERVISOR_RANK",
+        "DENY_SENSITIVE_UPDATE_WITH_LOW_RANK"
+      ]
+    },
+    "emergency": {
+      "description": "Escalates emergency access for supervisory review.",
+      "rule_ids": [
+        "ESCALATE_EMERGENCY_REVIEW_REQUIRED"
+      ]
+    },
+    "privacy": {
+      "description": "Escalates juvenile, victim, or witness-sensitive records.",
+      "rule_ids": [
+        "ESCALATE_PRIVACY_SENSITIVE_RECORD"
+      ]
+    },
+    "jurisdiction": {
+      "description": "Escalates cross-jurisdiction sensitive record access.",
+      "rule_ids": [
+        "ESCALATE_CROSS_JURISDICTION_SENSITIVE_RECORD"
+      ]
+    },
+    "sensitivity": {
+      "description": "Uses record sensitivity level in denial, escalation, and routine allow rules.",
+      "rule_ids": [
+        "DENY_TRAINING_PURPOSE_FOR_SENSITIVE_RECORD",
+        "DENY_SENSITIVE_UPDATE_WITH_LOW_RANK",
+        "DENY_CLASSIFIED_SHARE_WITHOUT_VALID_APPROVAL",
+        "ESCALATE_CROSS_JURISDICTION_SENSITIVE_RECORD",
+        "ESCALATE_CLASSIFIED_RECORD_APPROVAL_REQUIRED",
+        "ESCALATE_MISSING_APPROVAL_FOR_SENSITIVE_RECORD"
+      ]
+    },
+    "network": {
+      "description": "Escalates degraded station-node status when the request is not an emergency.",
+      "rule_ids": [
+        "ESCALATE_NODE_STATUS_DEGRADED"
+      ]
+    },
+    "routine_allow": {
+      "description": "Allows routine contextual access when request, purpose, action, sensitivity, assignment, and jurisdiction conditions are satisfied.",
+      "rule_ids": [
+        "ALLOW_ROUTINE_CONTEXTUAL_ACCESS"
+      ]
+    },
+    "fallback_review": {
+      "description": "Escalates requests that do not satisfy a routine allow rule and are not already denied.",
+      "rule_ids": [
+        "ESCALATE_CONTEXTUAL_REVIEW_REQUIRED"
+      ]
+    }
+  },
+  "ablation_methods": [
+    {
+      "method_id": "rbac_role_action_only",
+      "method_name": "RBAC role/action only",
+      "method_type": "baseline",
+      "mode": "rbac",
+      "disabled_rule_groups": [],
+      "description": "Role, action, credential, and purpose baseline. It ignores jurisdiction, sensitivity, privacy flags, approval context, sealed records, and emergency review."
+    },
+    {
+      "method_id": "full_configured_pbac",
+      "method_name": "Full configured PBAC/ABAC",
+      "method_type": "proposed",
+      "mode": "configured",
+      "disabled_rule_groups": [],
+      "description": "Configured equivalent of the Step 2 policy oracle."
+    },
+    {
+      "method_id": "no_approval_rules",
+      "method_name": "Ablation: approval rules removed",
+      "method_type": "ablation",
+      "mode": "configured",
+      "disabled_rule_groups": [
+        "approval"
+      ],
+      "description": "Removes expired token, missing approval, and classified sharing checks."
+    },
+    {
+      "method_id": "no_assignment_rules",
+      "method_name": "Ablation: assignment rules removed",
+      "method_type": "ablation",
+      "mode": "configured",
+      "disabled_rule_groups": [
+        "assignment"
+      ],
+      "description": "Removes stale assignment checks and assignment use in routine allow logic."
+    },
+    {
+      "method_id": "no_sealed_record_rules",
+      "method_name": "Ablation: sealed-record rules removed",
+      "method_type": "ablation",
+      "mode": "configured",
+      "disabled_rule_groups": [
+        "sealed_record"
+      ],
+      "description": "Removes sealed-record denial/escalation checks."
+    },
+    {
+      "method_id": "no_privacy_rules",
+      "method_name": "Ablation: privacy rules removed",
+      "method_type": "ablation",
+      "mode": "configured",
+      "disabled_rule_groups": [
+        "privacy"
+      ],
+      "description": "Removes juvenile, victim, and witness sensitivity escalation."
+    },
+    {
+      "method_id": "no_jurisdiction_rules",
+      "method_name": "Ablation: jurisdiction rules removed",
+      "method_type": "ablation",
+      "mode": "configured",
+      "disabled_rule_groups": [
+        "jurisdiction"
+      ],
+      "description": "Removes cross-jurisdiction sensitive-record escalation."
+    },
+    {
+      "method_id": "no_sensitivity_rules",
+      "method_name": "Ablation: sensitivity rules removed",
+      "method_type": "ablation",
+      "mode": "configured",
+      "disabled_rule_groups": [
+        "sensitivity"
+      ],
+      "description": "Removes sensitivity-level use from policy checks and routine allow logic."
+    },
+    {
+      "method_id": "no_emergency_network_rules",
+      "method_name": "Ablation: emergency/network rules removed",
+      "method_type": "ablation",
+      "mode": "configured",
+      "disabled_rule_groups": [
+        "emergency",
+        "network"
+      ],
+      "description": "Removes emergency review and degraded-node review checks."
+    },
+    {
+      "method_id": "no_context_review_fallback",
+      "method_name": "Ablation: fallback review removed",
+      "method_type": "ablation",
+      "mode": "configured",
+      "disabled_rule_groups": [
+        "fallback_review"
+      ],
+      "description": "Removes the final contextual escalation fallback, forcing unresolved requests to allow."
+    }
+  ]
+}

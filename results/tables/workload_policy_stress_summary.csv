@@ -1,0 +1,9 @@
+arm,num_requests,classified_ratio,cross_jurisdiction_ratio,revoked_credential_ratio,approval_missing_ratio,allow_rate,deny_rate,escalate_rate,nspi_train_accuracy,cs_f25_signed_chain_detect,cs_f25_nspi_global_detect,cs_f25_nspi_per_station_detect,cs_f25_trusted_oracle_detect,cs_f10_nspi_global_detect,cs_f10_nspi_per_station_detect,cs_f10_trusted_oracle_detect,cf_coverage,cf_validity,runtime_seconds,n_seeds
+mix_high_approval_missing,1000,0.2442,0.813,0.0758,0.5518,0.0868,0.5244,0.3888,0.9518,0.0,1.0,1.0,1.0,1.0,0.6,1.0,0.9973,1.0,3.896,5
+mix_high_classified_proxy,1000,0.3044,0.8848,0.0718,0.4924,0.0438,0.3752,0.581,0.938,0.0,1.0,1.0,1.0,1.0,0.8,1.0,1.0,1.0,3.898,5
+mix_high_cross_jurisdiction,1000,0.2502,0.8204,0.0694,0.4688,0.0876,0.3666,0.5458,0.9568,0.0,1.0,1.0,1.0,1.0,0.8,1.0,0.9973,1.0,3.968,5
+mix_high_revoked_credential,1000,0.2466,0.8006,0.2542,0.5546,0.0908,0.5156,0.3936,0.952,0.0,1.0,1.0,1.0,1.0,0.8,1.0,0.9987,1.0,3.898,5
+size_baseline,500,0.2464,0.7752,0.0976,0.4576,0.1148,0.4116,0.4736,0.9148,0.0,1.0,0.8,1.0,0.2,0.2,1.0,1.0,1.0,3.376,5
+size_baseline,1000,0.2386,0.7814,0.0942,0.4534,0.1122,0.4036,0.4842,0.9468,0.0,1.0,1.0,1.0,1.0,0.6,1.0,1.0,1.0,3.96,5
+size_baseline,2500,0.2434,0.7838,0.0917,0.4582,0.1041,0.4097,0.4862,0.968,0.0,1.0,1.0,1.0,1.0,1.0,1.0,0.9987,1.0,5.616,5
+size_baseline,5000,0.2455,0.7873,0.0876,0.4602,0.101,0.4045,0.4945,0.9738,0.0,1.0,1.0,1.0,1.0,1.0,1.0,0.9987,1.0,8.794,5

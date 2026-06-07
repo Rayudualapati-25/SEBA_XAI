@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="980" height="480" viewBox="0 0 980 480">
+<rect width="100%" height="100%" fill="#ffffff"/>
+<text x="190" y="34" font-family="Arial" font-size="22" font-weight="700" fill="#1f2933">Local Build/Decision Latency p50</text>
+<text x="190" y="58" font-family="Arial" font-size="13" fill="#52606d">p50 milliseconds for local prototype artifact generation</text>
+<line x1="190" y1="68" x2="190" y2="358" stroke="#9aa5b1" stroke-width="1"/>
+<line x1="190" y1="358" x2="944" y2="358" stroke="#9aa5b1" stroke-width="1"/>
+<line x1="190.00" y1="68" x2="190.00" y2="358" stroke="#edf2f7" stroke-width="1"/>
+<text x="190.00" y="380" font-family="Arial" font-size="11" text-anchor="middle" fill="#52606d">0.0</text>
+<line x1="340.80" y1="68" x2="340.80" y2="358" stroke="#edf2f7" stroke-width="1"/>
+<text x="340.80" y="380" font-family="Arial" font-size="11" text-anchor="middle" fill="#52606d">3.8</text>
+<line x1="491.60" y1="68" x2="491.60" y2="358" stroke="#edf2f7" stroke-width="1"/>
+<text x="491.60" y="380" font-family="Arial" font-size="11" text-anchor="middle" fill="#52606d">7.5</text>
+<line x1="642.40" y1="68" x2="642.40" y2="358" stroke="#edf2f7" stroke-width="1"/>
+<text x="642.40" y="380" font-family="Arial" font-size="11" text-anchor="middle" fill="#52606d">11.3</text>
+<line x1="793.20" y1="68" x2="793.20" y2="358" stroke="#edf2f7" stroke-width="1"/>
+<text x="793.20" y="380" font-family="Arial" font-size="11" text-anchor="middle" fill="#52606d">15.1</text>
+<line x1="944.00" y1="68" x2="944.00" y2="358" stroke="#edf2f7" stroke-width="1"/>
+<text x="944.00" y="380" font-family="Arial" font-size="11" text-anchor="middle" fill="#52606d">18.9</text>
+<text x="180" y="107.37" font-family="Arial" font-size="12" text-anchor="end" fill="#243b53">policy_oracle_xai</text>
+<rect x="190" y="68.00" width="578.13" height="63.50" rx="3" fill="#2F5D8C"/>
+<text x="776.13" y="107.37" font-family="Arial" font-size="12" fill="#102a43">14.5</text>
+<text x="180" y="182.87" font-family="Arial" font-size="12" text-anchor="end" fill="#243b53">mutable_log</text>
+<rect x="190" y="143.50" width="273.48" height="63.50" rx="3" fill="#3B826B"/>
+<text x="471.48" y="182.87" font-family="Arial" font-size="12" fill="#102a43">6.84</text>
+<text x="180" y="258.37" font-family="Arial" font-size="12" text-anchor="end" fill="#243b53">signed_hash_chain</text>
+<rect x="190" y="219.00" width="673.21" height="63.50" rx="3" fill="#9A6A2F"/>
+<text x="871.21" y="258.37" font-family="Arial" font-size="12" fill="#102a43">16.8</text>
+<text x="180" y="333.87" font-family="Arial" font-size="12" text-anchor="end" fill="#243b53">permissioned_blockchain_style</text>
+<rect x="190" y="294.50" width="443.61" height="63.50" rx="3" fill="#6B5CA5"/>
+<text x="641.61" y="333.87" font-family="Arial" font-size="12" fill="#102a43">11.1</text>
+<text x="36" y="456" font-family="Arial" font-size="11" fill="#6b7280">Source: generated SEBA-XAI prototype artifacts; synthetic local workload only.</text>
+</svg>

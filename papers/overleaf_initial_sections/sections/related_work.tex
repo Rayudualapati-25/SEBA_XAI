@@ -1,0 +1,43 @@
+\section{Related Work}
+
+This section groups previous work into five areas: Indian digital policing infrastructure, blockchain for digital evidence and audit, access control and privacy, explainable AI in high-stakes law-enforcement settings, and India-specific crime analytics. The purpose is to show what already exists and where the proposed work is positioned.
+
+\subsection{Indian Digital Policing: CCTNS and ICJS}
+
+CCTNS and ICJS provide the institutional baseline for this research. Official CCTNS information shows that India already has large-scale police digitization, including FIR and chargesheet digitization, data replication, search facilities, standardized investigation forms, and master codes \cite{pib_cctns_2026}. ICJS extends this by linking police/CCTNS with courts, prisons, forensics, and prosecution \cite{mha_icjs_2026}. These systems show that the Indian context is not a missing-infrastructure problem.
+
+For this paper, the important observation is that official infrastructure descriptions do not provide an open research workload for access-request decisions, explanation traces, audit attacks, or policy evaluation. Therefore, the proposed work is not a replacement for CCTNS or ICJS. It is an overlay research model for access governance, auditability, and explanation.
+
+\subsection{Blockchain for Evidence and Audit}
+
+Blockchain has been widely studied as a tool for evidence integrity and chain-of-custody management. Kim et al. proposed a two-level blockchain system for digital crime evidence management, separating frequently changing investigation information from less frequently changing evidence such as videos \cite{kim_two_level_2021}. LEChain proposed a blockchain-based lawful evidence management scheme for digital forensics, including evidence access control and privacy concerns for witnesses and jurors \cite{li_lechain_2021}. A Hyperledger Fabric-based digital evidence management model also shows how permissioned blockchain can support distributed evidence management among authorized participants \cite{jeong_fabric_evidence_2020}.
+
+These works support the idea that blockchain can improve tamper-evident audit and evidence provenance. However, they mostly focus on evidence lifecycle management, digital forensics, or chain-of-custody. The present work differs by focusing on inter-agency access governance: who should be allowed to access which sensitive record, under which policy, with what approval, and with what explanation.
+
+Hyperledger Fabric is relevant because it is designed for permissioned networks with known organizations, membership identities, modular consensus, and configurable execution \cite{androulaki_fabric_2018}. NISTIR 8403 and blockchain access-control surveys show that blockchain can support auditability and tamper resistance, but also introduce governance, privacy, scalability, and policy-complexity issues \cite{nist_blockchain_access_2022,rouhani_access_control_survey_2019}. These sources prevent overclaiming: blockchain is useful as an audit layer, but it is not a complete privacy or authorization solution.
+
+\subsection{Access Control, Privacy, and Policy Enforcement}
+
+Access control is central to SEBA-XAI. NIST SP 800-162 defines ABAC as authorization based on subject, object, action, and environmental attributes evaluated against policies \cite{nist_abac_2014}. This is suitable for inter-agency police data sharing because access decisions depend on more than a user's broad role. A requester may have the right rank but not the correct jurisdiction, case assignment, approval token, or purpose.
+
+Fabric plus ABAC has already been studied for fine-grained data sharing on Hyperledger Fabric \cite{zhao_fabric_abac_2022}. This prior work shows that blockchain and ABAC can be combined with encrypted off-chain storage and on-chain references. More recent accountable and privacy-preserving blockchain access-control work studies privacy and accountability concerns such as permission invisibility and access anonymity \cite{hu_accountable_private_ac_2024}. Privacy-preserving machine learning surveys also map techniques such as differential privacy, federated learning, secure multiparty computation, homomorphic encryption, and trusted execution environments \cite{xu_ppml_survey_2021,abadi_dp_sgd_2016}.
+
+The limitation for the present research is that these works do not directly evaluate police-specific access-request workflows with superior approval, explanation artifacts, revocation cases, metadata exposure, and adversarial audit attacks. SEBA-XAI uses the access-control literature as a technical foundation, but the contribution is in integrating policy enforcement with audit and explanation in a controlled police-record-sharing benchmark.
+
+\subsection{XAI, Fairness, and High-Stakes Law Enforcement}
+
+Explainability is important in this domain because access decisions may affect privacy, investigations, and accountability. Rudin argues that high-stakes applications should prefer interpretable models where possible rather than relying only on explanations of black-box models \cite{rudin_2019}. Law-enforcement XAI literature also emphasizes that explanations must account for stakeholder needs, AI literacy, and automation-bias risk \cite{zocholl_xai_law_enforcement_2025}.
+
+Criminal-justice AI literature warns against overclaiming predictive systems. Dressel and Farid showed limits of complex recidivism prediction tools compared with simpler baselines \cite{dressel_fairness_limits_2018}. Fairness research shows that different fairness criteria can conflict, especially when base rates differ across groups \cite{chouldechova_2017,kleinberg_tradeoffs_2016}. Ensign et al. showed that predictive-policing systems can create feedback loops when policing attention influences observed future data \cite{ensign_feedback_2018}. These works motivate a conservative research direction: this paper does not attempt individual suspect prediction or crime prediction. It focuses on access governance and explanation of access decisions.
+
+Some recent works combine blockchain, XAI, and legal or justice contexts. Blockchain-based auditing of legal decisions supported by explainable AI and generative AI tools connects audit trails with AI-supported legal decision-making \cite{sachan_legal_ai_blockchain_2024}. A blockchain-based XAI-justice system also shows that privacy, blockchain, and XAI can be combined at an architecture level \cite{demertzis_xai_justice_2023}. These works are close in spirit, but they are not designed around CCTNS/ICJS-compatible inter-agency police record access.
+
+\subsection{India-Specific Crime Analytics and Legal Data}
+
+India-specific crime analytics commonly uses aggregate NCRB data. Studies have analyzed spatial and demographic crime patterns, including crime against women and murder-motive forecasting with XAI methods \cite{sharma_india_crime_2023,naick_murder_xai_2024,reza_crix_2025}. Indian legal-NLP datasets such as IndianBailJudgments-1200 are also emerging \cite{deshmukh_bail_2025}. These datasets and papers are useful for understanding Indian crime and legal-data research, but they do not solve the access-governance problem.
+
+The key limitation is that public NCRB-style data is aggregate reported/registered crime data, not a record-level police access-control dataset \cite{ncrb_2023}. Therefore, SEBA-XAI uses synthetic access requests for the first benchmark. This keeps the work reproducible without making unsupported claims about restricted police records.
+
+\subsection{Research Gap}
+
+The reviewed work shows that the individual components already exist: CCTNS/ICJS infrastructure, blockchain evidence management, ABAC and PBAC-style access control, privacy-preserving mechanisms, and XAI for high-stakes decisions. The remaining gap is their integration and evaluation for a sensitive inter-agency police-record access workflow. Specifically, prior work does not sufficiently address a CCTNS/ICJS-compatible overlay that jointly evaluates contextual access decisions, superior-review escalation, off-chain record commitments, permissioned blockchain-style audit, explanation artifacts, metadata exposure, and adversarial audit cases. This is the gap addressed by SEBA-XAI.

@@ -1,0 +1,39 @@
+{
+  "artifact_type": "paper_evidence_pack",
+  "created_at_utc": "2026-05-27T19:08:35.731293Z",
+  "generated_plots": [
+    "results/plots/paper_false_allows_by_method.svg",
+    "results/plots/paper_tamper_detection_by_design.svg",
+    "results/plots/paper_metadata_exposure_score.svg",
+    "results/plots/paper_latency_build_verify.svg",
+    "results/plots/paper_policy_ablation_false_allows.svg"
+  ],
+  "generated_tables": [
+    "results/tables/paper_table_01_method_comparison.csv",
+    "results/tables/paper_table_02_tamper_detection.csv",
+    "results/tables/paper_table_03_metadata_exposure.csv",
+    "results/tables/paper_table_04_latency_storage.csv",
+    "results/tables/paper_table_05_policy_ablation.csv"
+  ],
+  "generated_text": [
+    "papers/final_paper/results/README.md",
+    "papers/final_paper/results/experiment_results_narrative.md",
+    "reports/iteration/iter_018_paper_evidence_pack.md"
+  ],
+  "limitations": [
+    "Derived from synthetic local prototype artifacts only.",
+    "No real police data, CCTNS data, ICJS data, FIR text, victim record, witness record, or juvenile record is used.",
+    "No production cryptography, legal compliance proof, or deployment benchmark is claimed."
+  ],
+  "result_claim": "derived paper tables, plots, and narrative from saved synthetic prototype artifacts",
+  "run_id": "20260528_paper_evidence_pack",
+  "source_artifacts": [
+    "prototype/runs/20260527_step3_audit_baselines_seed42/artifacts/audit_detection_summary.csv",
+    "prototype/runs/20260527_step4_permissioned_blockchain_audit_seed42/artifacts/blockchain_detection_summary.csv",
+    "prototype/runs/20260527_step5_latency_storage_overhead/artifacts/overhead_comparison.csv",
+    "prototype/runs/20260527_step6_experiment_modes_seed42/artifacts/experiment_mode_comparison.csv",
+    "prototype/runs/20260527_step7_offchain_encrypted_pointers_seed42/artifacts/metadata_leakage_comparison.csv",
+    "prototype/runs/20260527_step7_offchain_encrypted_pointers_seed42/artifacts/offchain_tamper_test_results.csv",
+    "prototype/runs/20260528_step8_policy_config_ablation_seed42/artifacts/policy_ablation_effects.csv"
+  ]
+}

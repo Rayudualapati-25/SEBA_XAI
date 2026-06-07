@@ -1,0 +1,17 @@
+# Pinned dependency snapshot for reproducibility.
+# Generated 2026-05-28 against Python 3.13.5 on macOS arm64.
+# Use this lockfile for byte-level reproduction:
+#     pip install -r requirements-lock.txt
+# instead of the looser ranges in pyproject.toml.
+
+imodels==1.4.6
+numpy==2.4.6
+pandas==2.3.3
+scikit-learn==1.8.0
+scipy==1.17.1
+
+# Dev tooling
+mypy==1.14.1
+pytest==8.3.4
+pytest-cov==5.0.0
+ruff==0.15.14

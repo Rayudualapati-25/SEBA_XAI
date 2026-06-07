@@ -1,0 +1,111 @@
+% =====================================================================
+% SEBA-XAI - Introduction-only build
+%
+% Purpose: a clean, compilable Overleaf draft that contains ONLY the
+% final professor-level Introduction and its references. All other
+% sections are present as empty placeholders so the section ordering,
+% numbering, and bibliography flow match the eventual full paper.
+%
+% This file does NOT replace main.tex. It is a sibling build target you
+% can switch to in Overleaf (Menu -> Settings -> Main document ->
+% main_intro_only.tex) when you want to share just the Introduction with
+% your supervisor.
+%
+% Bibliography: references_intro_only.bib (12 keys, exactly the ones
+% cited in the Introduction).
+% =====================================================================
+
+\documentclass[conference]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{array}
+
+\begin{document}
+
+\title{SEBA-XAI: A Secure, Explainable, Blockchain-Audited Overlay for Inter-Agency Police Record Access Governance}
+
+\author{
+\IEEEauthorblockN{Alapati Venkat Rayudu}
+\IEEEauthorblockA{
+Department of Computer Science and Engineering\\
+SRM University AP\\
+Amaravati, India\\
+Email: alapativenkatarayudu@gmail.com}
+}
+
+\maketitle
+
+\begin{abstract}
+Audit pipelines for sensitive records contain a quiet blind spot. When
+the signing authority is compromised, ledger-only integrity checks,
+ABAC re-execution, and Fabric-style chaincode replay all pass on a
+corrupted but validly re-signed log. This paper names that scenario the
+\emph{validly re-signed compromised signer} and studies it inside a
+CCTNS- and ICJS-compatible secure overlay for inter-agency police
+record access governance. We propose SEBA-XAI, an overlay that combines
+contextual access control using RBAC, ABAC, and PBAC principles,
+off-chain sensitive-record commitments, permissioned blockchain-style
+audit, and logged explanation artifacts bound to audit events by hash.
+The novel mechanism inside SEBA-XAI is NS-PI, an interpretable
+neuro-symbolic policy-induction and drift-detection component that
+operates with log-only visibility. NS-PI is evaluated side by side with
+a trusted raw-attribute policy oracle baseline that assumes an
+independent view of the original requests, so the paper measures the
+gap between the two visibility regimes rather than presenting either as
+universally best. The evaluation uses a reproducible synthetic
+CCTNS/ICJS-style workload, because actual police access logs are not
+publicly available. The paper does not claim live deployment, real
+police records, legal compliance, or improved crime-prediction
+performance.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Blockchain audit, access control, explainable AI, police data governance, CCTNS, ICJS, ABAC, XAI, security.
+\end{IEEEkeywords}
+
+% ---------------------------------------------------------------------
+% Section I -- Introduction (the only fully written section in this build)
+% ---------------------------------------------------------------------
+\input{sections/introduction_final_professor}
+
+% ---------------------------------------------------------------------
+% Sections II onward: intentionally left empty in this build.
+% Each \section{} preserves the eventual ordering and lets IEEEtran emit
+% the expected section numbers without any prose.
+% ---------------------------------------------------------------------
+
+\section{Related Work}
+% Intentionally left blank in the Introduction-only build.
+
+\section{Threat Model}
+% Intentionally left blank in the Introduction-only build.
+
+\section{Proposed Methodology}
+% Intentionally left blank in the Introduction-only build.
+
+\section{Evaluation Setup}
+% Intentionally left blank in the Introduction-only build.
+
+\section{Results}
+% Intentionally left blank in the Introduction-only build.
+
+\section{Discussion}
+% Intentionally left blank in the Introduction-only build.
+
+\section{Limitations}
+% Intentionally left blank in the Introduction-only build.
+
+\section{Conclusion and Future Work}
+% Intentionally left blank in the Introduction-only build.
+
+% ---------------------------------------------------------------------
+% References: bibliography file restricted to the 12 keys cited above.
+% ---------------------------------------------------------------------
+\bibliographystyle{IEEEtran}
+\bibliography{references_intro_only}
+
+\end{document}
