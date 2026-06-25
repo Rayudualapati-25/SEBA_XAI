@@ -5,12 +5,21 @@ paper treats it as an access-governance problem. India already has major
 digital policing and criminal-justice infrastructure. The Crime and Criminal
 Tracking Network and Systems (CCTNS) is reported by official sources to be in
 use across all 17,798 police stations as of 1 February 2026~\cite{pib_cctns_2026}.
-The Inter-Operable Criminal Justice System (ICJS) connects the police/CCTNS
-pillar with courts, prisons, forensics, and prosecution~\cite{mha_icjs_2026}.
+The Inter-Operable Criminal Justice System (ICJS) further links the CCTNS
+police layer with courts, prisons, forensic services, and prosecution
+workflows~\cite{mha_icjs_2026}.
 Because of this, the research question is not whether India needs a new
 replacement for CCTNS or ICJS. The question is more specific: if sensitive
 records move through an inter-agency workflow, how can access decisions be
 controlled, audited, and explained in a way that can be reviewed later?
+Although India provides the application context for this paper, the underlying
+problem is not limited to India. Recent work on accountable blockchain-based
+access control~\cite{hu_accountable_private_ac_2024}, privacy-preserving
+ABAC~\cite{kerl_privacy_abac_2025}, and explainable AI in law
+enforcement~\cite{zocholl_xai_law_enforcement_2025} shows that access
+accountability, privacy, and explanation are active international research
+problems, but they are often studied separately rather than as one access
+governance workflow.
 
 This question matters because police records are not ordinary database rows. A
 single request may involve FIR details, victim or witness information, juvenile
@@ -20,7 +29,26 @@ references, or court/prosecution-linked documents. A broad role such as
 allowed to view one record, denied another, and escalated for a third depending
 on jurisdiction, case assignment, purpose, sensitivity level, credential
 status, approval state, emergency context, and the agency relationship behind
-the request.
+the request. A real-world policing example shows why even police metadata must
+be handled carefully: in 2023, a Police Service of Northern Ireland data breach
+exposed officer and staff details such as names, ranks, and locations, and the
+UK Information Commissioner's Office later imposed a fine over the
+incident~\cite{guardian_psni_breach_2023,ico_psni_fine_2024}. This example is
+outside India, but it illustrates the same governance risk: sensitive police
+information and access metadata can create safety, privacy, and accountability
+problems if they are not controlled and reviewable.
+
+The intended users in this workflow are therefore not treated as one generic
+group. An investigating police officer may request FIR details, case diary
+material, or evidence references for an assigned case. A ranked or supervisory
+police officer may approve, reject, or escalate requests that cross station,
+district, or sensitivity boundaries. A forensic expert or laboratory specialist
+may need controlled access to sample references, laboratory reports, or
+evidence-chain records. A prosecutor, court-linked authority, or auditor may
+need later access to verify whether a decision followed the correct policy and
+approval path. These roles motivate an access model that checks not only who
+the requester is, but also what record is requested, why it is requested, under
+which authority, and what evidence should remain for later review.
 
 The problem addressed in this paper is therefore the following. Given a
 sensitive inter-agency request for a police or criminal-justice record, the
