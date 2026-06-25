@@ -16,26 +16,25 @@
 \maketitle
 
 \begin{abstract}
-Inter-agency police data sharing cannot be handled only as a database-sharing
-problem. Sensitive record access needs contextual authorization, tamper-evident
-audit, and explanations that can be reviewed later. This paper proposes
-SEBA-XAI, a secure, explainable, blockchain-audited overlay for CCTNS/ICJS-style
-police record access governance. The system combines a layered RBAC/ABAC/PBAC
-access-control service, off-chain sensitive-record storage, permissioned
-blockchain-style audit commitments, and an explainable decision service for
-\emph{allow}, \emph{deny}, and \emph{escalate} decisions. The paper also
-studies a validly re-signed compromised-signer threat, where policy output is
-corrupted but the audit log still appears internally valid. The evaluation uses
-a reproducible synthetic workload because real police access logs are not
-publicly available. The current evidence supports a limited claim:
-blockchain-style audit, contextual policy re-evaluation, trusted raw-attribute
-checking, and explainable log-only drift detection catch different failure modes
-under different visibility assumptions. Across five synthetic seeds, the
-validly re-signed compromised-signer attack is missed by integrity-only audit
-baselines but detected by NS-PI drift and a trusted raw-attribute policy oracle
-under their respective assumptions. The work does not claim live
-CCTNS/ICJS deployment, real police-record testing, legal compliance, production
-security, or crime prediction.
+Inter-agency police data sharing is not only a database-sharing problem.
+Sensitive record access needs contextual authorization, tamper-evident audit,
+and explanations that can be reviewed later. This paper proposes SEBA-XAI, an
+application-layer access-governance and audit overlay for CCTNS/ICJS-compatible
+police record workflows. Blockchain is used because multiple agencies may need a
+shared tamper-evident audit trail without copying raw records into one central
+database. The system keeps sensitive records off-chain and combines an
+ABAC-based policy service, permissioned ledger-backed audit records, and an
+explainable decision service for \emph{allow}, \emph{deny}, and
+\emph{escalate} requests. The paper also studies a post-decision corruption
+case: a compromised component changes the recorded policy decision and re-signs
+the event, so the audit log still appears cryptographically valid. Because real
+police access logs are not public, the evaluation uses a reproducible synthetic
+workload. The results show that integrity-only audit baselines detect ordinary
+tampering but miss the validly re-signed corruption case. In the same benchmark,
+NS-PI drift detection and a trusted raw-attribute policy oracle detect that case
+under different visibility assumptions. These findings support a scoped
+prototype claim: access control, blockchain audit, and explainable review
+artifacts address different failure modes and should be evaluated together.
 \end{abstract}
 
 \begin{IEEEkeywords}
