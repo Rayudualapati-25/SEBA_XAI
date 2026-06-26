@@ -48,3 +48,6 @@ sources/reference_papers/*.pdf
 # and run metadata in experiments/runs/.
 prototype/runs/*
 !prototype/runs/README.md
+
+# Local LaTeX build outputs from compiling the Overleaf source.
+papers/overleaf_ieee_journal/main.pdf

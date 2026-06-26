@@ -60,30 +60,20 @@ placing raw sensitive records on a shared ledger. It must also avoid assuming
 that one mechanism, whether blockchain, access control, or AI, is enough by
 itself.
 
-\subsection{Challenges and Contributions}
+\subsection{Practical Challenges}
 
-The paper is written around four practical challenges. Each challenge leads to
-one contribution.
+The paper is written around four practical challenges that arise when sensitive
+police or criminal-justice records are requested across agencies.
 
 \begin{itemize}
     \item \textbf{Contextual access governance.} Inter-agency police access
     cannot be handled only with static roles. Access depends on the requester,
     record, action, purpose, approval state, and operating context.
 
-    \textbf{Contribution 1:} The paper designs a layered access-control service
-    for CCTNS/ICJS-style access requests. The service combines RBAC,
-    ABAC, and PBAC-style rules and returns one of three decisions:
-    \emph{allow}, \emph{deny}, or \emph{escalate}.
-
     \item \textbf{Tamper-evident audit across agencies.} A shared audit trail is
     useful only if later reviewers can trust that decision evidence has not
     been silently changed. At the same time, raw sensitive records should not
     be copied to a common blockchain.
-
-    \textbf{Contribution 2:} The paper implements a permissioned
-    blockchain-style audit layer that records request identifiers, policy
-    versions, decision hashes, explanation hashes, approval references, record
-    commitments, and block commitments while keeping raw records off-chain.
 
     \item \textbf{Explainable access decisions.} When a police officer,
     investigating agency, court-related authority, or auditor requests access
@@ -92,17 +82,33 @@ one contribution.
     affect investigation timelines, privacy protection, inter-agency
     accountability, and later legal or administrative review.
 
-    \textbf{Contribution 3:} The paper builds an explainable decision service
-    that records the decision label, reason code, decisive attributes,
+    \item \textbf{Valid-looking corrupted logs.} A stronger attacker may change
+    policy output and then re-sign the log. In that case, the log can look
+    internally valid even though the decision has been corrupted.
+\end{itemize}
+
+\subsection{Research Contributions}
+
+To address these challenges, this paper makes the following four contributions.
+
+\begin{itemize}
+    \item \textbf{Contribution 1:} The paper designs a layered access-control
+    service for CCTNS/ICJS-compatible access requests. The service combines
+    RBAC, ABAC, and PBAC-style rules and returns one of three decisions:
+    \emph{allow}, \emph{deny}, or \emph{escalate}.
+
+    \item \textbf{Contribution 2:} The paper implements a permissioned
+    blockchain-style audit layer that records request identifiers, policy
+    versions, decision hashes, explanation hashes, approval references, record
+    commitments, and block commitments while keeping raw records off-chain.
+
+    \item \textbf{Contribution 3:} The paper builds an explainable decision
+    service that records the decision label, reason code, decisive attributes,
     policy/rule version, counterfactual information where applicable, and an
     explanation hash linked to the audit event. The explanation is treated as
     an audit artifact, not only as a message shown on a screen.
 
-    \item \textbf{Valid-looking corrupted logs.} A stronger attacker may change
-    policy output and then re-sign the log. In that case, the log can look
-    internally valid even though the decision has been corrupted.
-
-    \textbf{Contribution 4:} The paper defines and runs a reproducible
+    \item \textbf{Contribution 4:} The paper defines and runs a reproducible
     adversarial benchmark for ordinary tamper attacks and a validly re-signed
     compromised-signer attack. It compares mutable logs, signed hash chains,
     blockchain-style audit, CT-style logs, ABAC/Fabric-style re-execution, a
