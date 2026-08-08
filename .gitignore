@@ -64,3 +64,9 @@ node_modules/
 
 # Local runtime state from the Fabric implementation
 seba_fabric_workspace/crime-records-network/.smoke-offchain/
+
+# Learning material that carries its own git history — not part of this repo.
+# fabric-docs is a clone of hyperledger/fabric-docs (re-clonable, third-party).
+# solidity-practice is separate coursework with its own repository.
+Learn/fabric-docs/
+Learn/solidity-practice/
