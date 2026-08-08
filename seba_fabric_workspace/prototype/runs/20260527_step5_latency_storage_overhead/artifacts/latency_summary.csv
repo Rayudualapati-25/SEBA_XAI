@@ -1,0 +1,11 @@
+component,operation,unit,count,repeats,total_ms_p50,total_ms_p95,total_ms_p99,ms_per_unit_p50,throughput_units_per_sec_p50,note
+policy_oracle_xai,evaluate_one_request,request,1000,1000,0.013666,0.018583,0.031565,0.013666,73174.30,"Includes deterministic policy decision, rule-trace explanation, and decision/explanation/audit hashes."
+policy_oracle_xai,evaluate_all_requests,request,1000,7,14.461375,15.846580,16.182450,0.014461,69149.72,"Repeated aggregate timing for deterministic policy decision, rule-trace explanation, and hash generation."
+mutable_log,build_and_write,event,1000,7,6.840958,7.974179,8.047869,0.006841,146178.36,Creates centralized mutable CSV log from labeled requests and writes it to disk.
+mutable_log,schema_verify,event,1000,7,0.685708,0.983304,1.038394,0.000686,1458346.70,Schema-only verification; does not provide internal tamper evidence.
+signed_hash_chain,build_and_write,event,1000,7,16.839833,17.078837,17.091267,0.016840,59383.01,"Creates event payload hashes, previous links, event hashes, demo signatures, and writes CSV."
+signed_hash_chain,create_one_signed_event,event,1000,1000,0.008625,0.009375,0.010918,0.008625,115942.03,Per-event hashing/signing sample from first repeat.
+signed_hash_chain,verify_chain,event,1000,7,9.158000,9.246396,9.247445,0.009158,109194.15,"Recomputes payload hashes, previous links, event hashes, and demo signatures."
+permissioned_blockchain_style,build_and_write,event,1000,7,11.096375,11.490721,11.497111,0.011096,90119.52,"Builds blocks, event commitments, Merkle roots, validator signatures, quorum endorsements, and writes chain/index files."
+permissioned_blockchain_style,create_one_block,block,20,20,0.348750,0.412867,0.557141,0.348750,2867.39,Per-block creation sample from first repeat.
+permissioned_blockchain_style,verify_chain,block,20,7,2.503417,2.607308,2.628028,0.125171,7989.08,"Verifies block links, Merkle roots, validator signatures, quorum endorsements, and block hashes."

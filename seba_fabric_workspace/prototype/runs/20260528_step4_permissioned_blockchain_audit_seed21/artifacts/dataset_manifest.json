@@ -1,0 +1,32 @@
+{
+  "artifact_hashes": {
+    "block_event_index.csv": "27a8e045c24ee2037eb529f3a63acb2ee8042a639968c0180c14768504c43a72",
+    "blockchain_detection_summary.csv": "f5977b621e5839d655dff3ab647297845c2a81889383d5758059bbb7186540bf",
+    "blockchain_tamper_test_results.csv": "87fc7bef483df7daf90a2d92ac3c2f4d0ac301108689783c50531884d4697f39",
+    "comparison_with_step3_signed_log.csv": "00396b1e35ff3d2456f7606dcc93d833abc6e1ca1bcda76dea473566c17ca8d3",
+    "permissioned_audit_blocks.jsonl": "60e074967b34f93edff121cb47406c1aed5edc263334ab02ae607ba28bb05a08",
+    "validator_set.json": "74e383e7c9799741fc74ce4e98cbf87fbac64226066424390fbda1b62d7e05e2"
+  },
+  "block_size": 50,
+  "chain_version": "CHAIN-2026-05-STEP4",
+  "created_at_utc": "2026-06-06T18:48:11.228087Z",
+  "hyperledger_fabric_implemented": false,
+  "input_file": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260528_step3_audit_baselines_seed21/artifacts/signed_hash_chain_log.csv",
+  "input_file_sha256": "e735962b2ab60107b584b7a97857346fe0c10e457eb9af297796f81ea0b7b2a3",
+  "notes": [
+    "This is a local permissioned blockchain-style simulation, not a deployed blockchain.",
+    "The chain stores audit commitments only, not raw sensitive records.",
+    "Validator signatures use deterministic demo HMAC keys."
+  ],
+  "raw_explanation_included": false,
+  "raw_record_included": false,
+  "run_id": "20260528_step4_permissioned_blockchain_audit_seed21",
+  "synthetic_only": true,
+  "tampered_artifact_hashes": {
+    "changed_event_commitment": "612402669f5619c683aaec05bd3abf9c5291f28fe11e214f6b06c033dd46afc0",
+    "changed_merkle_root": "643367323fe65ba5c0ba2e8bd93b0290a281aef7247826489bd3ed34c61331f1",
+    "changed_validator_signature": "c09b71e0e4001c7c6056e6270e8719f465d94b459c244dae1c2d55e6d8f9d650",
+    "deleted_event_commitment": "0f41b154e691f74aca90e03050cf533723cae7cbc0306ad35372e35315a3ce24",
+    "reordered_blocks": "6e81fe1600e7df41bf2a809c1a2d96c30b5a1dbebf508da5bed670f7f30f8bba"
+  }
+}

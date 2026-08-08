@@ -1,0 +1,14 @@
+rule_group,description,rule_ids
+action_rank,Checks supervisor rank for approval action and rank for sensitive updates.,DENY_APPROVAL_ACTION_WITHOUT_SUPERVISOR_RANK|DENY_SENSITIVE_UPDATE_WITH_LOW_RANK
+approval,"Checks approval-token expiry, classified sharing, and missing approval for sensitive records.",DENY_EXPIRED_APPROVAL_TOKEN|DENY_CLASSIFIED_SHARE_WITHOUT_VALID_APPROVAL|ESCALATE_CLASSIFIED_RECORD_APPROVAL_REQUIRED|ESCALATE_MISSING_APPROVAL_FOR_SENSITIVE_RECORD
+assignment,Checks stale case assignment and uses assignment in routine allow logic.,DENY_STALE_CASE_ASSIGNMENT
+credential,Checks whether the requester credential is active.,DENY_INACTIVE_CREDENTIAL
+emergency,Escalates emergency access for supervisory review.,ESCALATE_EMERGENCY_REVIEW_REQUIRED
+fallback_review,Escalates requests that do not satisfy a routine allow rule and are not already denied.,ESCALATE_CONTEXTUAL_REVIEW_REQUIRED
+jurisdiction,Escalates cross-jurisdiction sensitive record access.,ESCALATE_CROSS_JURISDICTION_SENSITIVE_RECORD
+network,Escalates degraded station-node status when the request is not an emergency.,ESCALATE_NODE_STATUS_DEGRADED
+privacy,"Escalates juvenile, victim, or witness-sensitive records.",ESCALATE_PRIVACY_SENSITIVE_RECORD
+purpose,Checks recognized purpose and blocks training purpose on sensitive records.,DENY_TRAINING_PURPOSE_FOR_SENSITIVE_RECORD
+routine_allow,"Allows routine contextual access when request, purpose, action, sensitivity, assignment, and jurisdiction conditions are satisfied.",ALLOW_ROUTINE_CONTEXTUAL_ACCESS
+sealed_record,Checks sealed records and court/prosecution context.,DENY_SEALED_RECORD_WITHOUT_COURT_CONTEXT|ESCALATE_SEALED_RECORD_REVIEW_REQUIRED
+sensitivity,"Uses record sensitivity level in denial, escalation, and routine allow rules.",DENY_TRAINING_PURPOSE_FOR_SENSITIVE_RECORD|DENY_SENSITIVE_UPDATE_WITH_LOW_RANK|DENY_CLASSIFIED_SHARE_WITHOUT_VALID_APPROVAL|ESCALATE_CROSS_JURISDICTION_SENSITIVE_RECORD|ESCALATE_CLASSIFIED_RECORD_APPROVAL_REQUIRED|ESCALATE_MISSING_APPROVAL_FOR_SENSITIVE_RECORD

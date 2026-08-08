@@ -1,0 +1,21 @@
+{
+  "artifact_hashes": {
+    "decision_confusion_by_method.csv": "e9b7ae5769b33e27704966a644e7cba735c37c6cd9c99cce628f87c7dcee3843",
+    "experiment_mode_comparison.csv": "11435c354b6c2d06a3e9cf0a3e643ea0919879bb6f8eab3e7a284ac75f0e3371",
+    "experiment_mode_predictions.csv": "8fce19634ce01bebea151c2c0eed35761cfc11717086989db95b94cdba5349d0",
+    "method_definitions.json": "fa0e7db6a775131e8b64946769828d2282c2d296caa2dfb9cc23391c2ae55acb"
+  },
+  "created_at_utc": "2026-05-27T19:00:34.125866Z",
+  "input_hashes": {
+    "step1_request_file": "3bfaca563b526b84643a23b01ac043d1ad907411d018ea9b922353f24df18d8b",
+    "step2_labeled_file": "c4e4906fd927932e2a960a8fdebf2d09e4a34bc9299380db868e7692ef134402"
+  },
+  "notes": [
+    "This run consolidates earlier prototype stages into explicit methods.",
+    "The final proposed method is seba_xai_full.",
+    "Do not describe this as real police-system accuracy.",
+    "Audit/XAI detection rates are artifact-derived from the configured Step 3, Step 4, and Step 7 runs."
+  ],
+  "run_id": "20260527_step6_experiment_modes_seed42",
+  "synthetic_only": true
+}

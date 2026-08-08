@@ -1,0 +1,10 @@
+created_at_utc=2026-05-27T19:00:30.045754Z
+run_id=20260527_step7_offchain_encrypted_pointers_seed42
+records=900
+request_pointers=1000
+store_valid=True
+pointers_valid=True
+tamper_detected=10/10
+metadata_leakage=[{'ledger_design': 'full_metadata_ledger', 'total_events': 1000, 'column_count': 27, 'clear_sensitive_columns': 19, 'hashed_or_commitment_columns': 4, 'unique_clear_station_ids': 48, 'unique_clear_roles': 9, 'unique_clear_record_types': 9, 'unique_clear_case_types': 8, 'unique_clear_sensitivity_levels': 4, 'privacy_flag_columns_visible': 4, 'sealed_status_visible': 'true', 'decision_visible': 'true', 'reason_code_visible': 'true', 'purpose_visible': 'true', 'action_visible': 'true', 'requester_station_visible': 'true', 'target_station_visible': 'true', 'metadata_exposure_score': '1.0000', 'interpretation': 'High schema-level metadata exposure because clear policy context is visible.'}, {'ledger_design': 'minimized_commitment_ledger', 'total_events': 1000, 'column_count': 15, 'clear_sensitive_columns': 0, 'hashed_or_commitment_columns': 12, 'unique_clear_station_ids': 0, 'unique_clear_roles': 0, 'unique_clear_record_types': 0, 'unique_clear_case_types': 0, 'unique_clear_sensitivity_levels': 0, 'privacy_flag_columns_visible': 0, 'sealed_status_visible': 'false', 'decision_visible': 'false', 'reason_code_visible': 'false', 'purpose_visible': 'false', 'action_visible': 'false', 'requester_station_visible': 'false', 'target_station_visible': 'false', 'metadata_exposure_score': '0.0000', 'interpretation': 'Reduced schema-level exposure because sensitive context is represented by hashes/commitments. This is not a formal privacy proof.'}]
+status=success
+claim=offchain_storage_and_metadata_exposure_simulation_only

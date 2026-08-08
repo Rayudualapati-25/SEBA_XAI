@@ -1,0 +1,4 @@
+method,tamper_cases,detected,not_detected,detection_rate,scope
+mutable,4,0,4,0.0000,step3 local log baseline
+signed_hash_chain,4,4,0,1.0000,step3 local log baseline
+permissioned_blockchain_style,5,5,0,1.0000,step4 permissioned blockchain-style simulation

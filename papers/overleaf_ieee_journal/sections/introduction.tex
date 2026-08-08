@@ -1,166 +1,228 @@
 \section{Introduction}
 
-Police data sharing is often discussed as an infrastructure problem. This
-paper treats it as an access-governance problem. India already has major
-digital policing and criminal-justice infrastructure. The Crime and Criminal
-Tracking Network and Systems (CCTNS) is reported by official sources to be in
-use across all 17,798 police stations as of 1 February 2026~\cite{pib_cctns_2026}.
-The Inter-Operable Criminal Justice System (ICJS) further links the CCTNS
-police layer with courts, prisons, forensic services, and prosecution
-workflows~\cite{mha_icjs_2026}.
-Because of this, the research question is not whether India needs a new
-replacement for CCTNS or ICJS. The question is more specific: if sensitive
-records move through an inter-agency workflow, how can access decisions be
-controlled, audited, and explained in a way that can be reviewed later?
-Although India provides the application context for this paper, the underlying
-problem is not limited to India. Recent work on accountable blockchain-based
-access control~\cite{hu_accountable_private_ac_2024}, privacy-preserving
-ABAC~\cite{kerl_privacy_abac_2025}, and explainable AI in law
-enforcement~\cite{zocholl_xai_law_enforcement_2025} shows that access
-accountability, privacy, and explanation are active international research
-problems, but they are often studied separately rather than as one access
-governance workflow.
+\IEEEPARstart{C}{onnecting} police databases is largely an engineering exercise.
+Governing what happens once they are connected is not. When a sensitive
+criminal-justice record becomes technically reachable by a partner agency, the
+decisive questions are no longer about transport or storage. They concern
+authority and evidence: on what basis was a particular request allowed, denied,
+or escalated; which attributes of the requester, the record, and the situation
+actually determined that outcome; and what trustworthy trace of the decision
+remains for a reviewer who arrives months later, possibly in an adversarial
+setting such as a departmental inquiry or a court proceeding. This paper
+therefore treats inter-agency police data sharing as an access-governance
+problem rather than as an infrastructure problem.
 
-This question matters because police records are not ordinary database rows. A
-single request may involve FIR details, victim or witness information, juvenile
-records, forensic material, cybercrime complaints, case diary content, evidence
-references, or court/prosecution-linked documents. A broad role such as
-``police officer'' is not enough to decide access. The same officer may be
-allowed to view one record, denied another, and escalated for a third depending
-on jurisdiction, case assignment, purpose, sensitivity level, credential
-status, approval state, emergency context, and the agency relationship behind
-the request. A real-world policing example shows why even police metadata must
-be handled carefully: in 2023, a Police Service of Northern Ireland data breach
-exposed officer and staff details such as names, ranks, and locations, and the
-UK Information Commissioner's Office later imposed a fine over the
-incident~\cite{guardian_psni_breach_2023,ico_psni_fine_2024}. This example is
-outside India, but it illustrates the same governance risk: sensitive police
-information and access metadata can create safety, privacy, and accountability
-problems if they are not controlled and reviewable.
+The distinction matters because the infrastructure already exists. The Crime
+and Criminal Tracking Network and Systems (CCTNS) is reported by official
+sources to be in use across all 17,798 police stations as of 1 February
+2026~\cite{pib_cctns_2026}, and the Inter-Operable Criminal Justice System
+(ICJS) is designed to carry data exchange between the CCTNS police pillar and
+the other criminal-justice pillars, including courts, prisons, forensic
+services, and prosecution workflows~\cite{mha_icjs_2026}. The research question
+is consequently not whether India needs a replacement for CCTNS or ICJS. It is
+narrower and more durable: when a sensitive record moves through an
+inter-agency workflow, how can the access decision itself be controlled,
+audited, and explained in a form that survives later review?
 
-The intended users in this workflow are therefore not treated as one generic
-group. An investigating police officer may request FIR details, case diary
-material, or evidence references for an assigned case. A ranked or supervisory
-police officer may approve, reject, or escalate requests that cross station,
-district, or sensitivity boundaries. A forensic expert or laboratory specialist
-may need controlled access to sample references, laboratory reports, or
-evidence-chain records. A prosecutor, court-linked authority, or auditor may
-need later access to verify whether a decision followed the correct policy and
-approval path. These roles motivate an access model that checks not only who
-the requester is, but also what record is requested, why it is requested, under
-which authority, and what evidence should remain for later review.
+India supplies the deployment context, but the underlying problem is not
+specific to India. Recent international work has independently studied
+accountable blockchain-based access control~\cite{hu_accountable_private_ac_2024},
+privacy-preserving ABAC~\cite{kerl_privacy_abac_2025}, blockchain protection of
+digital evidence~\cite{banerjee_dashdikpala_2026}, data protection for AI in
+criminal justice~\cite{anbarasi_ai_criminal_justice_2026}, and explainable AI
+for law enforcement~\cite{zocholl_xai_law_enforcement_2025}. Taken together,
+these strands establish that access accountability, privacy, evidentiary
+integrity, and explanation are all active research problems. Taken
+individually, they also expose the gap this paper targets: each strand is
+usually advanced in isolation, so a request that is authorised by one
+mechanism, logged by a second, and explained by a third is rarely evaluated as
+a single governed workflow.
 
-The problem addressed in this paper is therefore the following. Given a
+Police records resist generic access control because one request may touch FIR
+details, victim or witness identities, juvenile records, forensic material,
+cybercrime complaints, case-diary content, evidence references, or
+prosecution-linked documents. A coarse role such as ``police officer'' cannot
+settle such a request on its own. The same officer may legitimately be
+permitted one record, refused another, and referred upward for a third,
+depending on jurisdiction, case assignment, stated purpose, sensitivity class,
+credential status, approval state, emergency context, and the relationship
+between the requesting and holding agencies.
+
+The workflow is also multi-stakeholder, and the stakeholders do not share a
+single view of the same request. An investigating police officer requests FIR
+details, case-diary material, or evidence references for an assigned case. A
+ranked or supervisory officer approves, rejects, or escalates requests that
+cross station, district, or sensitivity boundaries. A forensic expert or
+laboratory specialist requires controlled access to sample references,
+laboratory reports, or evidence-chain records. A prosecutor, court-linked
+authority, or auditor arrives after the fact and must verify whether a decision
+followed the applicable policy and approval path. This last role is the most
+demanding one for system design, because it is separated in time from the
+decision it examines: whatever evidence was not recorded at decision time
+cannot be recovered at review time. Collectively, these roles motivate an
+access model that establishes not only who the requester is, but also what
+record was sought, why, under whose authority, and what evidence should persist
+for later scrutiny.
+
+The cost of getting this wrong extends to police personnel themselves. In 2023,
+a Police Service of Northern Ireland data breach exposed officer and staff
+details such as names, ranks, and locations, and the UK Information
+Commissioner's Office subsequently imposed a fine over the
+incident~\cite{guardian_psni_breach_2023,ico_psni_fine_2024}. The incident
+occurred outside India and outside the CCTNS/ICJS setting, which is precisely
+what makes it instructive: police information and the metadata surrounding
+access to it carry safety, privacy, and accountability risk in any
+jurisdiction once disclosure is neither controlled nor reviewable.
+
+A further observation shapes the evaluation reported here. Audit mechanisms
+built on signatures, hash chains, or ledgers answer one question well: has the
+recorded log been altered since it was written? They do not answer a second and
+equally consequential question: does the recorded decision still correspond to
+what policy required? An adversary who controls a signing component can
+overwrite a decision and then re-sign the resulting event, yielding a log that
+is cryptographically impeccable and semantically false. Integrity verification
+cannot detect this by construction. Any evaluation that reports tamper
+detection alone will therefore return a clean result on exactly the failure
+mode that matters most for accountability.
+
+The problem addressed in this paper follows from these observations. Given a
 sensitive inter-agency request for a police or criminal-justice record, the
-system should decide whether the request must be allowed, denied, or escalated.
-At the same time, it should preserve evidence about the decision: the request
-context, the policy version, the attributes that mattered, the explanation
-given, and the approval or review event connected to it. The design must avoid
-placing raw sensitive records on a shared ledger. It must also avoid assuming
-that one mechanism, whether blockchain, access control, or AI, is enough by
-itself.
+system must decide whether the request is allowed, denied, or escalated, and
+must at the same time preserve reviewable evidence of that decision: the
+request context, the policy version, the attributes that proved decisive, the
+explanation given, and the approval or review event connected to it. Two
+constraints bound the design. Raw sensitive records must never be placed on a
+shared ledger, and no single mechanism, whether blockchain, access control, or
+AI, may be assumed sufficient on its own.
 
 \subsection{Practical Challenges}
 
-The paper is written around four practical challenges that arise when sensitive
-police or criminal-justice records are requested across agencies.
+The paper is organised around four practical challenges that arise when
+sensitive police or criminal-justice records are requested across agencies.
+Each challenge is paired with one contribution in the same order.
 
 \begin{itemize}
     \item \textbf{Contextual access governance.} Inter-agency police access
-    cannot be handled only with static roles. Access depends on the requester,
-    record, action, purpose, approval state, and operating context.
+    cannot be resolved by static roles alone, because the correct decision
+    depends jointly on the requester, the record, the action, the stated
+    purpose, the approval state, and the operating context.
 
     \item \textbf{Tamper-evident audit across agencies.} A shared audit trail is
-    useful only if later reviewers can trust that decision evidence has not
-    been silently changed. At the same time, raw sensitive records should not
-    be copied to a common blockchain.
+    useful only if later reviewers can trust that decision evidence has not been
+    silently altered. That trust must be established without copying raw
+    sensitive records onto a common blockchain.
 
-    \item \textbf{Explainable access decisions.} When a police officer,
-    investigating agency, court-related authority, or auditor requests access
-    to a sensitive record, the system should explain why the request was
-    allowed, denied, or escalated. This is important because such decisions can
-    affect investigation timelines, privacy protection, inter-agency
-    accountability, and later legal or administrative review.
+    \item \textbf{Explainable access decisions.} When an officer, an
+    investigating agency, a court-related authority, or an auditor seeks a
+    sensitive record, the system should be able to state why the request was
+    allowed, denied, or escalated. Such decisions bear on investigation
+    timelines, privacy protection, inter-agency accountability, and subsequent
+    legal or administrative review.
 
-    \item \textbf{Valid-looking corrupted logs.} A stronger attacker may change
-    policy output and then re-sign the log. In that case, the log can look
-    internally valid even though the decision has been corrupted.
+    \item \textbf{Valid-looking corrupted logs.} A stronger adversary can alter
+    policy output and re-sign the affected log entry, so that the log remains
+    internally valid while the decision it records has been corrupted.
 \end{itemize}
 
 \subsection{Research Contributions}
 
-To address these challenges, this paper makes the following four contributions.
+To address these challenges, the paper makes four contributions, ordered to
+match the challenges above.
 
 \begin{itemize}
-    \item \textbf{Contribution 1:} The paper designs a layered access-control
-    service for CCTNS/ICJS-compatible access requests. The service combines
-    RBAC, ABAC, and PBAC-style rules and returns one of three decisions:
-    \emph{allow}, \emph{deny}, or \emph{escalate}.
+    \item \textbf{Contribution 1:} A layered access-control service for
+    CCTNS/ICJS-compatible access requests, combining RBAC, ABAC, and PBAC-style
+    rules and returning one of three decisions: \emph{allow}, \emph{deny}, or
+    \emph{escalate}.
 
-    \item \textbf{Contribution 2:} The paper implements a permissioned
-    blockchain-style audit layer that records request identifiers, policy
-    versions, decision hashes, explanation hashes, approval references, record
-    commitments, and block commitments while keeping raw records off-chain.
+    \item \textbf{Contribution 2:} A permissioned blockchain-style audit layer
+    that records request identifiers, policy versions, decision hashes,
+    explanation hashes, approval references, record commitments, and block
+    commitments, while keeping raw records off-chain.
 
-    \item \textbf{Contribution 3:} The paper builds an explainable decision
-    service that records the decision label, reason code, decisive attributes,
-    policy/rule version, counterfactual information where applicable, and an
-    explanation hash linked to the audit event. The explanation is treated as
-    an audit artifact, not only as a message shown on a screen.
+    \item \textbf{Contribution 3:} An explainable decision service that records
+    the decision label, reason code, decisive attributes, policy or rule
+    version, counterfactual information where applicable, and an explanation
+    hash bound to the corresponding audit event. The explanation is treated as
+    an audit artifact rather than as a message displayed on a screen.
 
-    \item \textbf{Contribution 4:} The paper defines and runs a reproducible
-    adversarial benchmark for ordinary tamper attacks and a validly re-signed
-    compromised-signer attack. It compares mutable logs, signed hash chains,
-    blockchain-style audit, CT-style logs, ABAC/Fabric-style re-execution, a
-    trusted raw-attribute policy oracle, and NS-PI log-only drift detection.
+    \item \textbf{Contribution 4:} A reproducible adversarial benchmark
+    covering ordinary tamper attacks and a validly re-signed compromised-signer
+    attack, comparing mutable logs, signed hash chains, blockchain-style audit,
+    CT-style logs, ABAC/Fabric-style re-execution, a trusted raw-attribute
+    policy oracle, and NS-PI log-only drift detection.
 \end{itemize}
 
-The first contribution is mainly about security and access control. The second
-is about blockchain as an audit mechanism. The third is about explainable AI.
-The fourth makes the evaluation sharper by testing a failure mode where a log
-can remain cryptographically valid but semantically wrong. Together, these
-contributions keep the work focused on access governance rather than on broad
-claims about police automation.
+The first contribution is principally about security and access control, the
+second about blockchain as an audit mechanism, and the third about explainable
+AI. The fourth sharpens the evaluation by exercising a failure mode in which a
+log stays cryptographically valid while becoming semantically wrong. Together
+they hold the work to access governance rather than to broad claims about
+police automation.
 
-The access-control layer follows the ABAC idea that decisions can be based on
-subject, object, action, and environmental attributes~\cite{nist_abac_2014}.
-This fits the police data-sharing setting better than role-only access because
-the same role may require different decisions under different purposes,
-jurisdictions, and sensitivity levels. The blockchain layer is used narrowly:
-it gives tamper-evident audit commitments and provenance. It is not used as a
-privacy guarantee, and it does not store raw police records. This is consistent
-with the cautious treatment of blockchain access-control systems in
-NISTIR~8403~\cite{nist_blockchain_access_2022} and with the permissioned
-blockchain model represented by Hyperledger Fabric~\cite{androulaki_fabric_2018}.
+\subsection{Design Scope of Each Layer}
 
-The explainable AI layer is also used in a narrow way. It does not explain
-crime prediction or suspect prediction. It explains access decisions. For each
-request, the system records why the request was allowed, denied, or escalated,
-which attributes were decisive, and what policy version was applied. This
-follows the broader argument that high-stakes systems should prefer
-interpretable and reviewable decisions when possible~\cite{rudin_2019}. It
-also follows recent law-enforcement XAI work, which warns that explanations
-must support different stakeholders and should not create blind trust in
-automated systems~\cite{zocholl_xai_law_enforcement_2025}.
+Each layer is deliberately used within narrow limits. The access-control layer
+follows the ABAC principle that decisions may be based on subject, object,
+action, and environmental attributes~\cite{nist_abac_2014}. This suits police
+data sharing better than role-only access, because an identical role can demand
+different outcomes under different purposes, jurisdictions, and sensitivity
+levels. The blockchain layer supplies tamper-evident audit commitments and
+provenance, and nothing more: it is not offered as a privacy guarantee and it
+stores no raw police records. This restraint is consistent with the cautious
+treatment of blockchain access-control systems in
+NISTIR~8403~\cite{nist_blockchain_access_2022} and with the permissioned model
+represented by Hyperledger Fabric~\cite{androulaki_fabric_2018}. The
+explainable AI layer explains access decisions only; it explains neither crime
+prediction nor suspect prediction. For each request it records why the request
+was allowed, denied, or escalated, which attributes were decisive, and which
+policy version applied. This reflects the wider argument that high-stakes
+systems should favour interpretable and reviewable decisions wherever
+possible~\cite{rudin_2019}, together with recent law-enforcement XAI work
+warning that explanations must serve distinct stakeholders and must not induce
+blind trust in automated systems~\cite{zocholl_xai_law_enforcement_2025}.
 
-The paper deliberately avoids the predictive-policing direction. Public
-National Crime Records Bureau data is useful for background context, but it is
-aggregate reported/registered crime data and is not a public individual-level
-CCTNS/FIR access-control dataset~\cite{ncrb_2023}. Prior work has also shown
-that predictive policing can create feedback loops when observed crime data is
-shaped by earlier policing decisions~\cite{ensign_feedback_2018}, and that
-complex criminal-justice prediction systems do not automatically outperform
-simple baselines~\cite{dressel_fairness_limits_2018}. For these reasons, this
-paper studies access governance, auditability, and explanation, not crime
-prediction.
+The paper also declines the predictive-policing direction as a matter of
+design. Public National Crime Records Bureau data is valuable as background
+context, but it reports aggregate registered crime and is not a public
+individual-level CCTNS or FIR access-control dataset~\cite{ncrb_2023}. Prior
+work has further shown that predictive policing can induce feedback loops when
+observed crime data is itself shaped by earlier policing
+decisions~\cite{ensign_feedback_2018}, and that complex criminal-justice
+prediction systems do not automatically outperform simple
+baselines~\cite{dressel_fairness_limits_2018}. The paper accordingly studies
+access governance, auditability, and explanation, not crime prediction.
+
+\subsection{Scope of Claims}
 
 The proposed system is named SEBA-XAI: a Secure, Explainable,
-Blockchain-Audited overlay for sensitive inter-agency access governance. The
-evaluation uses a synthetic workload because real police access logs and
-sensitive records are not publicly available. The claim is therefore
-controlled and limited. The paper does not claim live deployment inside CCTNS
-or ICJS, legal compliance, real police-record validation, production security,
-formal privacy, or state-of-the-art performance. Its contribution is an
-implemented benchmark and prototype that studies how access control,
-blockchain-style audit, and XAI behave together under explicit trust and
-visibility assumptions, including baselines, ablations, and failure cases.
+Blockchain-Audited overlay for sensitive inter-agency access governance. Its
+central empirical finding is an asymmetry. In the adversarial benchmark, every
+integrity-based defence, including signed hash chains, blockchain-style audit,
+CT-style logs, and ABAC/Fabric-style re-execution, detects ordinary tampering
+yet records a detection rate of zero on the validly re-signed
+compromised-signer attack. Under different and stronger visibility assumptions,
+NS-PI log-only drift detection and a trusted raw-attribute policy oracle detect
+that same attack. The conclusion drawn is not that one defence dominates, but
+that these mechanisms answer different questions and should therefore be
+evaluated together rather than substituted for one another.
+
+Because real police access logs and sensitive records are not publicly
+available, the evaluation uses a reproducible synthetic workload, and the
+resulting claim is correspondingly bounded. The paper does not claim live
+deployment inside CCTNS or ICJS, legal compliance, validation on real police
+records, production-grade security, formal privacy, or state-of-the-art
+performance. What it offers is an implemented prototype and benchmark that show
+how access control, blockchain-style audit, and XAI behave in combination under
+explicit trust and visibility assumptions, with baselines, ablations, and
+failure cases reported alongside the positive results.
+
+The remainder of this paper is organised as follows. Section~\ref{sec:related}
+reviews related work on access control, blockchain-based audit, and explainable
+AI in criminal-justice settings, and identifies the gap addressed here.
+Section~\ref{sec:methodology} presents the SEBA-XAI architecture, its threat
+and visibility assumptions, and the adversarial benchmark design.
+Section~\ref{sec:results} reports and discusses the experimental results,
+including the compromised-signer asymmetry and the sensitivity boundaries of
+drift-based detection. Section~\ref{sec:limitations} states the limitations of
+the study, and Section~\ref{sec:conclusion} concludes.

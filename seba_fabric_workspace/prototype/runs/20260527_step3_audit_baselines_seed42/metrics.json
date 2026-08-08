@@ -1,0 +1,36 @@
+{
+  "artifact_type": "audit_baseline_tamper_test",
+  "audit_log_version": "AUDIT-2026-05-STEP3",
+  "events_logged": 1000,
+  "important_interpretation": [
+    "Mutable log self-verification checks only schema and cannot internally prove that a valid-looking row was changed.",
+    "Signed hash-chain verification detects the injected changes because payload hashes, previous links, event hashes, or demo signatures no longer match.",
+    "This is a local signed-log baseline, not a blockchain consensus result."
+  ],
+  "input_file": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step2_policy_oracle_seed42/artifacts/labeled_access_requests.csv",
+  "limitations": [
+    "Demo HMAC signing key is fixed for reproducibility and is not production-grade key management.",
+    "Tamper cases are controlled synthetic manipulations.",
+    "No distributed ledger, consensus, Hyperledger Fabric, or multi-party replication has been implemented in this step.",
+    "No latency or throughput benchmark has been run in this step."
+  ],
+  "result_claim": "tamper-detection result for deterministic prototype logs only",
+  "self_detection_by_log_type": {
+    "mutable": {
+      "self_detected": 0,
+      "self_detection_rate": 0.0,
+      "tamper_cases": 4
+    },
+    "signed_hash_chain": {
+      "self_detected": 4,
+      "self_detection_rate": 1.0,
+      "tamper_cases": 4
+    }
+  },
+  "tamper_cases": [
+    "changed_decision",
+    "deleted_event",
+    "changed_explanation_hash",
+    "reordered_events"
+  ]
+}

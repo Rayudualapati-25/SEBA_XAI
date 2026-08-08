@@ -1,0 +1,13 @@
+{
+  "run_id": "20260702_fabric_audit_chain_scaffold",
+  "created_at_utc": "2026-07-02T00:00:00Z",
+  "artifact_type": "implementation_scaffold",
+  "scope": "Hyperledger Fabric hands-on extension for SEBA-XAI audit commitments",
+  "synthetic_only": true,
+  "raw_records_on_chain": false,
+  "fabric_executed": false,
+  "known_blocker": "Docker was not installed on the local machine when the scaffold was created.",
+  "new_folder": "prototype/fabric_audit_chain",
+  "claim_allowed": "Fabric-ready audit event preparation and chaincode/client scaffold exist.",
+  "claim_not_allowed": "Do not claim real Fabric ledger execution until scripts/02_start_network.sh and scripts/04_submit_events.sh complete successfully."
+}

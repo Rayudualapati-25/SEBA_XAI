@@ -1,0 +1,45 @@
+{
+  "artifact_type": "synthetic_dataset_profile",
+  "counts": {
+    "access_requests": 1000,
+    "cases": 360,
+    "officers": 240,
+    "records": 900,
+    "stations": 36
+  },
+  "credential_status_counts": {
+    "ACTIVE": 897,
+    "REVOKED": 97,
+    "SUSPENDED": 6
+  },
+  "cross_jurisdiction_counts": {
+    "false": 217,
+    "true": 783
+  },
+  "limitations": [
+    "Synthetic data only; no real CCTNS, ICJS, FIR, officer, victim, witness, or case records are included.",
+    "No RBAC, ABAC, PBAC, XAI, or blockchain audit decision has been implemented in this step.",
+    "Scenario labels support workload coverage; they are not experimental results."
+  ],
+  "raw_record_included": false,
+  "request_scenario_counts": {
+    "court_request": 73,
+    "cross_jurisdiction_sensitive": 156,
+    "emergency_override": 91,
+    "expired_approval_token": 58,
+    "juvenile_sensitive": 85,
+    "normal_in_jurisdiction": 205,
+    "random_context": 65,
+    "revoked_credential": 89,
+    "sealed_record": 83,
+    "stale_case_assignment": 95
+  },
+  "request_sensitivity_counts": {
+    "CLASSIFIED": 238,
+    "HIGH": 436,
+    "LOW": 75,
+    "MEDIUM": 251
+  },
+  "result_claim": "none; dataset generation only",
+  "synthetic_only": true
+}

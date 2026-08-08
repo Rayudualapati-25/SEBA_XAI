@@ -1,0 +1,3 @@
+ledger_design,events,columns,clear_sensitive_columns,hashed_or_commitment_columns,metadata_exposure_score,decision_visible,purpose_visible,requester_station_visible,target_station_visible,interpretation
+full_metadata_ledger,1000,27,19,4,1.0000,true,true,true,true,High schema-level metadata exposure because clear policy context is visible.
+minimized_commitment_ledger,1000,15,0,12,0.0000,false,false,false,false,Reduced schema-level exposure because sensitive context is represented by hashes/commitments. This is not a formal privacy proof.

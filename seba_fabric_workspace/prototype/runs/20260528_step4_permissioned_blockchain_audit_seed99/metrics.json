@@ -1,0 +1,36 @@
+{
+  "artifact_type": "permissioned_blockchain_style_audit_simulation",
+  "block_count": 20,
+  "blockchain_type": "permissioned; PoA/PBFT-style validator simulation; not PoW or PoS",
+  "chain_version": "CHAIN-2026-05-STEP4",
+  "consensus_model": "permissioned_poa_quorum_simulation",
+  "event_count": 1000,
+  "important_interpretation": [
+    "This step demonstrates a blockchain-style audit abstraction over existing signed audit-event commitments.",
+    "The chain stores hashes and audit metadata, not raw police records or raw explanation text.",
+    "This is not Hyperledger Fabric and does not prove deployment-grade blockchain security."
+  ],
+  "input_file": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260528_step3_audit_baselines_seed99/artifacts/signed_hash_chain_log.csv",
+  "limitations": [
+    "Validator signatures use deterministic demo HMAC keys for reproducible local testing.",
+    "No network, consensus latency, Byzantine node behavior, chaincode, channel privacy, or Fabric MSP is implemented.",
+    "Tamper cases are controlled synthetic manipulations.",
+    "A compromised quorum signing key scenario is not tested in this step."
+  ],
+  "quorum_threshold": 3,
+  "result_claim": "tamper-detection result for deterministic simulated permissioned audit chain only",
+  "tamper_cases": [
+    "changed_event_commitment",
+    "deleted_event_commitment",
+    "changed_merkle_root",
+    "changed_validator_signature",
+    "reordered_blocks"
+  ],
+  "tamper_detection": {
+    "detected": 5,
+    "detection_rate": 1.0,
+    "not_detected": 0,
+    "tamper_cases": 5
+  },
+  "validator_count": 4
+}

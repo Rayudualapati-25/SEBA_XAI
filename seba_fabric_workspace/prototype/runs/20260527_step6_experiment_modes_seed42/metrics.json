@@ -1,0 +1,37 @@
+{
+  "artifact_type": "explicit_experiment_mode_comparison",
+  "best_accuracy_method_ids": [
+    "abac_pbac_mutable_log",
+    "abac_pbac_signed_hash_chain",
+    "abac_pbac_blockchain_style",
+    "seba_xai_full"
+  ],
+  "created_at_utc": "2026-05-27T19:00:34.125866Z",
+  "decision_latency_ms_p50_total": {
+    "abac_pbac": 14.152334,
+    "rbac": 0.701125
+  },
+  "detection_evidence": {
+    "audit_rates": {
+      "mutable_log": "0.0000",
+      "permissioned_blockchain_style": "1.0000",
+      "signed_hash_chain": "1.0000"
+    },
+    "source_files": {
+      "step3_summary": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step3_audit_baselines_seed42/artifacts/audit_detection_summary.csv",
+      "step4_summary": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step4_permissioned_blockchain_audit_seed42/artifacts/blockchain_detection_summary.csv",
+      "step7_tamper_results": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step7_offchain_encrypted_pointers_seed42/artifacts/offchain_tamper_test_results.csv"
+    },
+    "xai_hash_detection_rate": "1.0000"
+  },
+  "limitations": [
+    "Ground truth is the deterministic Step 2 policy oracle, not real police access-control decisions.",
+    "RBAC is intentionally simple and uses only credential, role/rank, action, and purpose.",
+    "Latency values are local prototype additive estimates, not deployment measurements.",
+    "Audit and XAI tamper detection rates are read from controlled local tamper-test artifacts in earlier steps."
+  ],
+  "method_count": 5,
+  "proposed_method": "seba_xai_full",
+  "request_count": 1000,
+  "result_claim": "synthetic workload comparison against deterministic policy-oracle labels"
+}

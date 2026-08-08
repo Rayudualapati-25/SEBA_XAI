@@ -1,0 +1,168 @@
+{
+  "artifactType": "fabric_submit_results",
+  "input": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/fabric_audit_chain/runs/20260710_fabric_audit_event_prep/artifacts/fabric_audit_events.jsonl",
+  "channelName": "seba",
+  "chaincodeName": "seba-audit",
+  "eventsRequested": 25,
+  "eventsSubmitted": 25,
+  "elapsedMs": 50650.769250000005,
+  "p50SubmitLatencyMs": 2023.0471659999967,
+  "p95SubmitLatencyMs": 2027.8055830000003,
+  "submitted": [
+    {
+      "requestIdHash": "f02dea6f047664266cb38f7289c300a3e2c4bb5d36154341096002448c918bd3",
+      "fabricTxId": "594199f53df43cf8b5c1f43250a9ee3232fcf182e36f530c914beafc7a33d336",
+      "eventCommitmentHash": "90c6caf2d3a7f82f66b89ad39ee11eb73a989bfc587046009580ccea73269835",
+      "latencyMs": 2093.2313750000003
+    },
+    {
+      "requestIdHash": "f0c81d48db286dc6cbbe9c233e111cbd7ef43b264632d94152440959a234623c",
+      "fabricTxId": "5b450d6c9dbb8b957231396d03d9014f65b62a45e99c340a1c8ae560f32513f2",
+      "eventCommitmentHash": "cc438e099482097405c22f8890c92a313d9f9cd8d1b2f43d7f7b82688277dd60",
+      "latencyMs": 2020.37025
+    },
+    {
+      "requestIdHash": "daa44d0b20a3fc18b8d2789b951d4f3a8ba235f80cde3cd97b77885631c468c2",
+      "fabricTxId": "7f23cb5ecec2e4cd34ee514124a2464a910e3e0a1bf314036d7c318c78f80733",
+      "eventCommitmentHash": "532bf3184f69c8c1706efad73e022ebf14a0bdd62d246aac92cba9dfecc0d9de",
+      "latencyMs": 2027.8055830000003
+    },
+    {
+      "requestIdHash": "22fc4736dab533bb506eae0e6e341425cdab7b1448dbdc9ac3c50dfffa7e4760",
+      "fabricTxId": "df379ea49cb773f468f532d2d981ffb7372931fba4facfe1c45dead1446fa26d",
+      "eventCommitmentHash": "2552510c397b93a72035ddaad150f3757f1a12756b0fac0fb38192492d8b6180",
+      "latencyMs": 2023.8046670000003
+    },
+    {
+      "requestIdHash": "afbd50740d300a85e555aa2c1d9de7b8502f743b4994cdbe5ef36372a039142d",
+      "fabricTxId": "c63b82c7dde60232871a16483b6a9b00b3971543113a6386626803af117f60cf",
+      "eventCommitmentHash": "47301230d9a5efc7fc598949e16769cf21889e12b0322547354bc7c4337da509",
+      "latencyMs": 2026.443874999999
+    },
+    {
+      "requestIdHash": "4fdb51808a5a0316e19e97471f5fdf4c875274c94745b9b7887388d7c5cf2add",
+      "fabricTxId": "beb75fdea2b42ed7bfb1efd692cd8bb197c0032b32b7c1019f9140f102c1930b",
+      "eventCommitmentHash": "2f5e818edea419386ed9f451661883389f6df2793bb9bbc42c0d14bc5a5db929",
+      "latencyMs": 2023.4209169999995
+    },
+    {
+      "requestIdHash": "9b289712a04c701f6a5c76aa2099804951dae077688f1726c95a09d67c34ca5e",
+      "fabricTxId": "001080d605ad67220e3853ec0066ad90c006d50e72aaa42a7b2a0c6a9f13b0bd",
+      "eventCommitmentHash": "103a09e237f181fc8b51546e4b3c48fe7e9fd94a0d4071e4a9b3cad73f48d337",
+      "latencyMs": 2024.2394170000007
+    },
+    {
+      "requestIdHash": "06125be8aef9dfee4f6ba0b30f0d6cd4811b133251eaacb8ad07fd687a3085b7",
+      "fabricTxId": "d73befefae663e14ecd3686131fc7e6cea3b0f4f848a896fbf8c2cf78e396511",
+      "eventCommitmentHash": "92c2cd5f15fe2bc48133d8afa07b2940f493a8e669cdc72ef8169da53ab9348f",
+      "latencyMs": 2024.4377910000003
+    },
+    {
+      "requestIdHash": "4d849a5812b32352ac7df3c442a86d9b46672a5292d7e12f840acc2d9276aba9",
+      "fabricTxId": "1236d39f820d6511e47fd8a5c2263a408cdbe4dc29e740af6d019d34fa2fe58d",
+      "eventCommitmentHash": "1ff52045502e8a3d0cbb2abf528c2624188c45f1cc9cf3edaf7c47cda5d784aa",
+      "latencyMs": 2027.5822919999991
+    },
+    {
+      "requestIdHash": "019eec71af5872322677fbfff8c23685aac6ff5fc3f45c01c10308ccb7dffa21",
+      "fabricTxId": "e77bd3454dc67ea992344f8504b57e68bf93d1a261b264a1dfb96df714107f12",
+      "eventCommitmentHash": "355dc7d7db6255fd122c9c0a96df21665870c8738b807ea4fc0c22afb3a7b086",
+      "latencyMs": 2022.8524590000015
+    },
+    {
+      "requestIdHash": "387f6ec5043bbcc1d902e82bc28ac54e56f166e69a051b29daa13e60933e7fc1",
+      "fabricTxId": "8d285a6b04963ebade006337af8c36228171ab08a92dee6c9d9f96ab2103ff52",
+      "eventCommitmentHash": "602a6124e13b1284af67a77dc39d8fdbd0bc75ef472caea1338c422e2cd231d1",
+      "latencyMs": 2022.276415999997
+    },
+    {
+      "requestIdHash": "e9209053cc7fb4b7fea1f3d571ba599b9dd5b8f2d040a03c57413f93106d3ab9",
+      "fabricTxId": "2a5ba7683d32fa8b1c758a8ce3d8a72506e6ec4bf2c6faa837d08ec877de6cd3",
+      "eventCommitmentHash": "daca61962bdcc410f3b621cca01413da967278e4cd1f4c9440a53f25ef777a1f",
+      "latencyMs": 2022.7974170000016
+    },
+    {
+      "requestIdHash": "b484e6318ec280bf1cbd4dd80407437166ab2478a1915ec46413ca4b1ac6b5d1",
+      "fabricTxId": "62d9bff96c60a3b9820f193219057daebee21ae0bccc41f3721c1984b24feba2",
+      "eventCommitmentHash": "5db3987a10bf594eda5f13e33884137edf11c2a5a5ac3a3611fa2a5a3f73b9ea",
+      "latencyMs": 2022.1785000000018
+    },
+    {
+      "requestIdHash": "7eba3b4fef1a7469dde09cc17ecda1292f1090d5b4931006b66ab88a4c5d65c6",
+      "fabricTxId": "70a8badf098c15241ce3286a35ac2b7e3e5db129fadc6f90aa5ea9a330601dfc",
+      "eventCommitmentHash": "5fe784c1efa8f02428b2eb9d40394dbd7d9ac31e2d23e8b74ce294baa026dd0c",
+      "latencyMs": 2023.5767080000005
+    },
+    {
+      "requestIdHash": "8b86a3fad93f8b895531c5a603fe151c0f3e00e2c165fb48bd20aac5250379ce",
+      "fabricTxId": "d52f2d104e0a1e21fc37d3b096e1ddeb77f46ac6947c7f38605210e2ad25b6b0",
+      "eventCommitmentHash": "f746e0154b9aafc08ef63716584cdbc9b2b3463e414b52bf8f4f26c899828b32",
+      "latencyMs": 2022.4534999999996
+    },
+    {
+      "requestIdHash": "72b75c542c1f60f716545fc3d768ee4c645e7e98c44cef906ab194de9a820a42",
+      "fabricTxId": "1d2d4737c558c9a42b1c35df5cfad3bac5048280f3e95938be48d66444621e29",
+      "eventCommitmentHash": "6331cc708b897ef7d1880916ce8193ba4b9ab840290097f5f6db984572b52c55",
+      "latencyMs": 2022.407124999998
+    },
+    {
+      "requestIdHash": "31d7f91275c24dd223bca557ee4fcd46baf91f8d446e740d0179f9542d58add3",
+      "fabricTxId": "d9797187882a21a1605716f7da7168225e5658041e92aa77c4b112f87f8b30dc",
+      "eventCommitmentHash": "daada35d0571a0baa82f15dc602b4f9c7e8ae3bb95d5557e8d5dcf371d353a9f",
+      "latencyMs": 2021.5032500000016
+    },
+    {
+      "requestIdHash": "8575a5d1ca6fa1b8307c6091a1c4585a8b4a6eb550e73d65d68b682b576db921",
+      "fabricTxId": "2998d71610ce62e661142e71852c84d915927f4c8e971c468c97fc7e7f4d3288",
+      "eventCommitmentHash": "86e88e3d408e0f6ce6eb9b1fb9bd2119cf461933bbd4f54dd88aa98f5eae2e4d",
+      "latencyMs": 2021.3150830000013
+    },
+    {
+      "requestIdHash": "8b9050247a9b6545d96565b217e3d1fd2ba2ad515d0ab00de73fde704320076c",
+      "fabricTxId": "92d70ba25fd361e0cab8c0ac5717790ced21bbd53e75d67cce25ef9ec8064828",
+      "eventCommitmentHash": "d41aab55f33f87863d1cd2b5fbb278870d658705a65ec1c6049d3b1ce041781a",
+      "latencyMs": 2023.6732499999998
+    },
+    {
+      "requestIdHash": "104ac650d7d9192886824ad92619e0607ebd2a11b8b331615472f9644528b7d9",
+      "fabricTxId": "fceae1b46c76fe44365a9c8e6d6d5c8e076932e25d4685684c7240835efdb551",
+      "eventCommitmentHash": "26010afc71eb1293c7ad0f553086e29df5b564d21767217840c0c00c8bb1fb58",
+      "latencyMs": 2024.4122909999933
+    },
+    {
+      "requestIdHash": "87324102a77fdfedb400b28ae1731b6aefe93fcbad87fa25f3981daddd166517",
+      "fabricTxId": "def65a908b01cda31c663e1c4c433d51039d22e2f571343b5412dbb0d1ce4714",
+      "eventCommitmentHash": "7a1f1b8c672e91cfbf7b22dfcd2cde45144c166b749b7e6a9a87ecd765c4d513",
+      "latencyMs": 2018.0429999999978
+    },
+    {
+      "requestIdHash": "8e72716a93ec3e24be13ae4bc8e9026b970696ab98e71177b6134f7a3ec19ea6",
+      "fabricTxId": "42f9fd91a864a52e93453fc181fbd03ced151f242d880203a84ea34397c5cd88",
+      "eventCommitmentHash": "56542b2998f047bce5d8df0ea565b74fdc09832f20c6120416e5d288951ba976",
+      "latencyMs": 2022.2119579999999
+    },
+    {
+      "requestIdHash": "ee2e17ef0dee7f439dec755d3fd6c205892d2d3c06dfdaff7bc9d4fd8113f3c6",
+      "fabricTxId": "f7af58365745de08b5c3355650debe06217810981b0e7a4f00ec71eff1de30c1",
+      "eventCommitmentHash": "d7e523e4327261e72ffe70c6da3551a14896e930e45e87f3f2d4112bcfa9ffeb",
+      "latencyMs": 2023.0471659999967
+    },
+    {
+      "requestIdHash": "3c77d790ecd0a3c28463f21c434a82e86fdbbb3528963a11b7cec588bf8a2ffa",
+      "fabricTxId": "0393171b62d2703da6d197094c6412691be27425bd8b990b20311e8f074ffefc",
+      "eventCommitmentHash": "c738a9f02d4de10080a287b3c557a007cffd49329277412465491b6ee015f4fe",
+      "latencyMs": 2022.2732079999987
+    },
+    {
+      "requestIdHash": "2327a707ca75546d72bb337b64be5f065125eb2758265c032d29e31cf6ae5898",
+      "fabricTxId": "7677c259a5accad91ad936d4b05cce9f23f21df005c1f1c42c1923767b01b96f",
+      "eventCommitmentHash": "9ffc751aa8aba6584802c78accacfc7d66a222c77a4ca0bf81a6b8b54c5ab476",
+      "latencyMs": 2023.4671250000029
+    }
+  ],
+  "limitations": [
+    "These are Fabric test-network measurements only.",
+    "No real police records or CCTNS/ICJS logs are used.",
+    "Only commitment hashes and minimal audit metadata are submitted."
+  ]
+}

@@ -70,3 +70,10 @@ seba_fabric_workspace/crime-records-network/.smoke-offchain/
 # solidity-practice is separate coursework with its own repository.
 Learn/fabric-docs/
 Learn/solidity-practice/
+
+# Clones of hyperledger/fabric-samples: third-party, re-downloadable via
+# install-fabric.sh. Provides the peer/orderer binaries and the config
+# directory bind-mounted into the peers, so it must exist locally but is not
+# part of this repository.
+seba_fabric_workspace/fabric-samples/
+seba_fabric_workspace/prototype/fabric_audit_chain/.local/

@@ -1,0 +1,28 @@
+{
+  "chain_version": "CHAIN-2026-05-STEP4",
+  "consensus_model": "permissioned_poa_quorum_simulation",
+  "important_boundary": "Demo validators and keys are for deterministic local prototype testing only.",
+  "quorum_threshold": 3,
+  "validators": [
+    {
+      "agency_type": "POLICE",
+      "description": "Synthetic state police audit node",
+      "validator_id": "POLICE_AUDIT_NODE"
+    },
+    {
+      "agency_type": "FORENSIC",
+      "description": "Synthetic forensic-services audit node",
+      "validator_id": "FORENSIC_AUDIT_NODE"
+    },
+    {
+      "agency_type": "PROSECUTION",
+      "description": "Synthetic prosecution audit node",
+      "validator_id": "PROSECUTION_AUDIT_NODE"
+    },
+    {
+      "agency_type": "COURT_ICJS",
+      "description": "Synthetic court/ICJS-style audit node",
+      "validator_id": "COURT_ICJS_AUDIT_NODE"
+    }
+  ]
+}

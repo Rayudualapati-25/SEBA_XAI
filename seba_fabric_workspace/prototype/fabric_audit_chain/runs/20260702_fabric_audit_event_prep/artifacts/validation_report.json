@@ -1,0 +1,13 @@
+{
+  "all_valid": true,
+  "artifact_type": "fabric_audit_event_validation",
+  "decision_counts": {
+    "allow": 3,
+    "deny": 8,
+    "escalate": 14
+  },
+  "errors": [],
+  "events_checked": 25,
+  "input": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/fabric_audit_chain/runs/20260702_fabric_audit_event_prep/artifacts/fabric_audit_events.jsonl",
+  "raw_records_on_chain": false
+}

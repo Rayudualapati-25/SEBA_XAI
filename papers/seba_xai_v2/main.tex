@@ -1,0 +1,90 @@
+\documentclass[journal]{IEEEtran}
+
+\usepackage{cite}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{url}
+\usepackage{balance}
+
+\begin{document}
+
+\title{SEBA-XAI: Explainable Policy-Aware Audit for Secure Inter-Agency
+Police Data Access Governance}
+
+\author{%
+\begin{tabular}[t]{c@{\hspace{3em}}c}
+Alapati Venkat Rayudu & Tirthankar Sengupta \\
+Department of CSE & Department of CSE \\
+\textit{SRM University-AP, India} & \textit{SRM University-AP, India} \\
+venkatrayudu\_alapati@srmap.edu.in & sengupta.t@srmap.edu.in
+\end{tabular}}
+
+% Running headers: journal name on even pages, authors + short title on odd.
+\markboth{Journal of \LaTeX\ Class Files,~Vol.~XX, No.~X, [Month]~2026}%
+{Rayudu \MakeLowercase{\textit{et al.}}: SEBA-XAI: Explainable Policy-Aware
+Audit for Secure Inter-Agency Access Governance}
+
+\maketitle
+
+\begin{abstract}
+In criminal-justice workflows, job role alone is not sufficient to decide
+access to a sensitive record. For example, a sub-inspector and a constable may
+request the same case file and should not receive the same answer; the same
+officer may be permitted for one purpose and denied for another; and some
+records must remain closed to one department while another may read them. This
+paper proposes SEBA-XAI, an explainable access-governance overlay for record
+sharing between agencies. For every request the system evaluates attributes of
+the requester, the record, the requested action, the stated purpose and the
+operating context, and returns \emph{allow}, \emph{deny} or \emph{escalate}.
+It also stores the grounds for the decision: the attributes that were decisive
+and the policy version applied. Both are recorded in a tamper-evident audit
+trail on a permissioned blockchain that multiple agencies can verify, while
+the record remains with the agency holding it. The paper also studies an
+attack that such audit trails cannot detect. If an attacker controls the
+component that signs audit entries, a decision can be modified and signed
+again: the entry passes verification although the stored decision was never
+authorised. Since real access logs are not public, evaluation uses a
+reproducible synthetic workload over five seeds. The results show that all
+integrity-based defences considered detect ordinary tampering but obtain 0.00
+detection for this attack, whereas two methods that check the decisions
+instead of the signatures obtain 1.00 detection under stronger visibility
+assumptions. Integrity and correctness are therefore separate properties, and
+tamper detection alone is not sufficient to establish trust in an audit trail.
+\end{abstract}
+
+\begin{IEEEkeywords}
+Access control, access governance, attribute-based access control, blockchain
+audit, explainable AI, inter-agency data sharing, tamper evidence,
+auditability.
+\end{IEEEkeywords}
+
+\IEEEpeerreviewmaketitle
+
+\input{sections/introduction}
+
+% \input{sections/related_work}
+% \input{sections/proposed_methodology}
+% \input{sections/results_discussion}
+% \input{sections/limitations}
+% \input{sections/conclusion}
+
+\balance
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\begin{IEEEbiographynophoto}{Alapati Venkat Rayudu}
+is currently pursuing the M.Tech degree in artificial intelligence and
+machine learning with [University Name], [City, Country]. His research
+interests include access control, blockchain-based audit, and explainable
+artificial intelligence for criminal-justice data governance.
+\end{IEEEbiographynophoto}
+
+\begin{IEEEbiographynophoto}{Tirthankar Sengupta}
+is with the Department of Computer Science and Engineering,
+[University Name], [City, Country]. [His/Her/Their] research interests
+include [research areas].
+\end{IEEEbiographynophoto}
+
+\end{document}

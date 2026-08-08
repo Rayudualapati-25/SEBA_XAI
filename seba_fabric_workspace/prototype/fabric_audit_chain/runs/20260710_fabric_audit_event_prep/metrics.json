@@ -1,0 +1,18 @@
+{
+  "artifact_type": "fabric_audit_event_preparation",
+  "claim_not_supported_by_this_stage": "ledger commit is verified only by the separate Fabric submit artifact",
+  "claim_supported": "commitment-only Fabric audit events can be prepared from synthetic SEBA-XAI policy output",
+  "created_at_utc": "2026-07-10T13:58:24.484522Z",
+  "decision_counts": {
+    "allow": 3,
+    "deny": 8,
+    "escalate": 14
+  },
+  "events_prepared": 25,
+  "fabric_executed": false,
+  "fabric_execution_note": "This preparation script does not submit events to Fabric; run scripts/04_submit_events.sh after the network is running.",
+  "forbidden_output_fields_seen": [],
+  "input_file": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step2_policy_oracle_seed42/artifacts/labeled_access_requests.csv",
+  "input_file_sha256": "c4e4906fd927932e2a960a8fdebf2d09e4a34bc9299380db868e7692ef134402",
+  "raw_records_on_chain": false
+}

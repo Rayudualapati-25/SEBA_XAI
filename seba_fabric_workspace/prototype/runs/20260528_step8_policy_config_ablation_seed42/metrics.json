@@ -1,0 +1,149 @@
+{
+  "ablation_effects": [
+    {
+      "accuracy_drop_from_full": "0.7100",
+      "disabled_rule_groups": "none",
+      "extra_errors_vs_full": 710,
+      "false_allow_delta_from_full": 656,
+      "false_deny_delta_from_full": 54,
+      "false_escalate_delta_from_full": 0,
+      "interpretation": "Removal increases false allows, which is high risk for sensitive access governance.",
+      "method_id": "rbac_role_action_only",
+      "method_name": "RBAC role/action only",
+      "method_type": "baseline"
+    },
+    {
+      "accuracy_drop_from_full": "0.0000",
+      "disabled_rule_groups": "none",
+      "extra_errors_vs_full": 0,
+      "false_allow_delta_from_full": 0,
+      "false_deny_delta_from_full": 0,
+      "false_escalate_delta_from_full": 0,
+      "interpretation": "Reference configured policy; should match Step 2 oracle if configuration and evaluator are aligned.",
+      "method_id": "full_configured_pbac",
+      "method_name": "Full configured PBAC/ABAC",
+      "method_type": "proposed"
+    },
+    {
+      "accuracy_drop_from_full": "0.0530",
+      "disabled_rule_groups": "approval",
+      "extra_errors_vs_full": 53,
+      "false_allow_delta_from_full": 0,
+      "false_deny_delta_from_full": 0,
+      "false_escalate_delta_from_full": 53,
+      "interpretation": "Removal increases unnecessary escalations.",
+      "method_id": "no_approval_rules",
+      "method_name": "Ablation: approval rules removed",
+      "method_type": "ablation"
+    },
+    {
+      "accuracy_drop_from_full": "0.0650",
+      "disabled_rule_groups": "assignment",
+      "extra_errors_vs_full": 65,
+      "false_allow_delta_from_full": 0,
+      "false_deny_delta_from_full": 0,
+      "false_escalate_delta_from_full": 65,
+      "interpretation": "Removal increases unnecessary escalations.",
+      "method_id": "no_assignment_rules",
+      "method_name": "Ablation: assignment rules removed",
+      "method_type": "ablation"
+    },
+    {
+      "accuracy_drop_from_full": "0.1320",
+      "disabled_rule_groups": "sealed_record",
+      "extra_errors_vs_full": 132,
+      "false_allow_delta_from_full": 32,
+      "false_deny_delta_from_full": 0,
+      "false_escalate_delta_from_full": 100,
+      "interpretation": "Removal increases false allows, which is high risk for sensitive access governance.",
+      "method_id": "no_sealed_record_rules",
+      "method_name": "Ablation: sealed-record rules removed",
+      "method_type": "ablation"
+    },
+    {
+      "accuracy_drop_from_full": "0.0460",
+      "disabled_rule_groups": "privacy",
+      "extra_errors_vs_full": 46,
+      "false_allow_delta_from_full": 46,
+      "false_deny_delta_from_full": 0,
+      "false_escalate_delta_from_full": 0,
+      "interpretation": "Removal increases false allows, which is high risk for sensitive access governance.",
+      "method_id": "no_privacy_rules",
+      "method_name": "Ablation: privacy rules removed",
+      "method_type": "ablation"
+    },
+    {
+      "accuracy_drop_from_full": "0.0080",
+      "disabled_rule_groups": "jurisdiction",
+      "extra_errors_vs_full": 8,
+      "false_allow_delta_from_full": 8,
+      "false_deny_delta_from_full": 0,
+      "false_escalate_delta_from_full": 0,
+      "interpretation": "Removal increases false allows, which is high risk for sensitive access governance.",
+      "method_id": "no_jurisdiction_rules",
+      "method_name": "Ablation: jurisdiction rules removed",
+      "method_type": "ablation"
+    },
+    {
+      "accuracy_drop_from_full": "0.0440",
+      "disabled_rule_groups": "sensitivity",
+      "extra_errors_vs_full": 44,
+      "false_allow_delta_from_full": 19,
+      "false_deny_delta_from_full": 0,
+      "false_escalate_delta_from_full": 25,
+      "interpretation": "Removal increases false allows, which is high risk for sensitive access governance.",
+      "method_id": "no_sensitivity_rules",
+      "method_name": "Ablation: sensitivity rules removed",
+      "method_type": "ablation"
+    },
+    {
+      "accuracy_drop_from_full": "0.0010",
+      "disabled_rule_groups": "emergency|network",
+      "extra_errors_vs_full": 1,
+      "false_allow_delta_from_full": 1,
+      "false_deny_delta_from_full": 0,
+      "false_escalate_delta_from_full": 0,
+      "interpretation": "Removal increases false allows, which is high risk for sensitive access governance.",
+      "method_id": "no_emergency_network_rules",
+      "method_name": "Ablation: emergency/network rules removed",
+      "method_type": "ablation"
+    },
+    {
+      "accuracy_drop_from_full": "0.0150",
+      "disabled_rule_groups": "fallback_review",
+      "extra_errors_vs_full": 15,
+      "false_allow_delta_from_full": 15,
+      "false_deny_delta_from_full": 0,
+      "false_escalate_delta_from_full": 0,
+      "interpretation": "Removal increases false allows, which is high risk for sensitive access governance.",
+      "method_id": "no_context_review_fallback",
+      "method_name": "Ablation: fallback review removed",
+      "method_type": "ablation"
+    }
+  ],
+  "artifact_type": "configured_policy_ablation_experiment",
+  "full_configured_policy_accuracy": "1.0000",
+  "full_configured_policy_false_allows": 0,
+  "highest_false_allow_count": 656,
+  "highest_false_allow_method_id": "rbac_role_action_only",
+  "important_interpretation": [
+    "The Step 2 policy oracle is the reference label; these are not real police access-control labels.",
+    "False allows are treated as the highest-risk error because they represent access granted where the reference policy would deny or escalate.",
+    "Ablation rows show which policy dimensions matter under the synthetic workload."
+  ],
+  "input_files": {
+    "labeled_file": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step2_policy_oracle_seed42/artifacts/labeled_access_requests.csv",
+    "policy_config_file": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/synthetic_access_sim/policies/seba_xai_policy_v1.json",
+    "request_file": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step1_synthetic_requests_seed42/artifacts/access_requests.csv"
+  },
+  "limitations": [
+    "Policy rules are synthetic and conservative; they are not official CCTNS, ICJS, or police rules.",
+    "The configured evaluator is still local Python logic over a JSON policy structure, not a production policy engine such as OPA or XACML.",
+    "No legal compliance or operational deployment claim is made.",
+    "No human expert labels or real police access decisions are used."
+  ],
+  "method_count": 10,
+  "policy_version": "P-2026-05-CONFIG-V1",
+  "request_count": 1000,
+  "result_claim": "synthetic policy-oracle consistency and policy-group ablation only"
+}

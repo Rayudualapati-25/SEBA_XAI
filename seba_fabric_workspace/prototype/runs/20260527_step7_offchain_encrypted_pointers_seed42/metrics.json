@@ -1,0 +1,81 @@
+{
+  "artifact_type": "offchain_encrypted_pointer_and_metadata_leakage_simulation",
+  "counts": {
+    "ledger_events": 1000,
+    "offchain_record_payloads": 900,
+    "request_pointer_commitments": 1000
+  },
+  "important_interpretation": [
+    "This step models the SEBA-XAI design principle that raw records remain off-chain.",
+    "The minimized ledger stores commitments and hashes instead of clear role, station, sensitivity, purpose, action, decision, and reason-code metadata.",
+    "Pointer verification anchors decision hashes, XAI hashes, and block references back to generated Step 2 and Step 4 artifacts.",
+    "The metadata score is a schema-level exposure measure, not differential privacy, anonymity, or a legal-compliance proof."
+  ],
+  "input_files": {
+    "block_index_file": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step4_permissioned_blockchain_audit_seed42/artifacts/block_event_index.csv",
+    "labeled_file": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step2_policy_oracle_seed42/artifacts/labeled_access_requests.csv",
+    "records_file": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step1_synthetic_requests_seed42/artifacts/records.csv"
+  },
+  "limitations": [
+    "Encryption is a deterministic demo construction for reproducibility, not production-grade cryptography.",
+    "No real CCTNS, ICJS, FIR, victim, witness, or police record is included.",
+    "No key rotation, hardware security module, access-token exchange, or distributed storage service is implemented.",
+    "Metadata linkage through stable hashes is not fully eliminated and would require stronger privacy analysis in a real system."
+  ],
+  "metadata_leakage": [
+    {
+      "action_visible": "true",
+      "clear_sensitive_columns": 19,
+      "column_count": 27,
+      "decision_visible": "true",
+      "hashed_or_commitment_columns": 4,
+      "interpretation": "High schema-level metadata exposure because clear policy context is visible.",
+      "ledger_design": "full_metadata_ledger",
+      "metadata_exposure_score": "1.0000",
+      "privacy_flag_columns_visible": 4,
+      "purpose_visible": "true",
+      "reason_code_visible": "true",
+      "requester_station_visible": "true",
+      "sealed_status_visible": "true",
+      "target_station_visible": "true",
+      "total_events": 1000,
+      "unique_clear_case_types": 8,
+      "unique_clear_record_types": 9,
+      "unique_clear_roles": 9,
+      "unique_clear_sensitivity_levels": 4,
+      "unique_clear_station_ids": 48
+    },
+    {
+      "action_visible": "false",
+      "clear_sensitive_columns": 0,
+      "column_count": 15,
+      "decision_visible": "false",
+      "hashed_or_commitment_columns": 12,
+      "interpretation": "Reduced schema-level exposure because sensitive context is represented by hashes/commitments. This is not a formal privacy proof.",
+      "ledger_design": "minimized_commitment_ledger",
+      "metadata_exposure_score": "0.0000",
+      "privacy_flag_columns_visible": 0,
+      "purpose_visible": "false",
+      "reason_code_visible": "false",
+      "requester_station_visible": "false",
+      "sealed_status_visible": "false",
+      "target_station_visible": "false",
+      "total_events": 1000,
+      "unique_clear_case_types": 0,
+      "unique_clear_record_types": 0,
+      "unique_clear_roles": 0,
+      "unique_clear_sensitivity_levels": 0,
+      "unique_clear_station_ids": 0
+    }
+  ],
+  "minimization_profile": "SEBA-XAI-MIN-METADATA-V1",
+  "payload_schema_version": "SYNTHETIC_RECORD_PAYLOAD_V1",
+  "result_claim": "synthetic off-chain storage, pointer integrity, and schema-level metadata exposure comparison only",
+  "store_version": "OFFCHAIN-2026-05-STEP7",
+  "tamper_detection": {
+    "detected": 10,
+    "detection_rate": 1.0,
+    "not_detected": 0,
+    "tamper_cases": 10
+  }
+}

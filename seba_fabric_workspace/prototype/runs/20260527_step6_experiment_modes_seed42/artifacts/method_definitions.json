@@ -1,0 +1,49 @@
+{
+  "methods": [
+    {
+      "audit_mode": "mutable_log",
+      "decision_model": "rbac",
+      "description": "Role/action baseline with mutable centralized audit log.",
+      "method_id": "rbac_mutable_log",
+      "method_name": "RBAC + mutable log",
+      "xai_explanation_available": false,
+      "xai_hash_logged": false
+    },
+    {
+      "audit_mode": "mutable_log",
+      "decision_model": "abac_pbac",
+      "description": "Contextual policy oracle with mutable centralized audit log.",
+      "method_id": "abac_pbac_mutable_log",
+      "method_name": "ABAC/PBAC + mutable log",
+      "xai_explanation_available": false,
+      "xai_hash_logged": false
+    },
+    {
+      "audit_mode": "signed_hash_chain",
+      "decision_model": "abac_pbac",
+      "description": "Contextual policy oracle with signed append-only hash-chain audit.",
+      "method_id": "abac_pbac_signed_hash_chain",
+      "method_name": "ABAC/PBAC + signed hash-chain log",
+      "xai_explanation_available": false,
+      "xai_hash_logged": false
+    },
+    {
+      "audit_mode": "permissioned_blockchain_style",
+      "decision_model": "abac_pbac",
+      "description": "Contextual policy oracle with permissioned blockchain-style audit commitments.",
+      "method_id": "abac_pbac_blockchain_style",
+      "method_name": "ABAC/PBAC + blockchain-style audit",
+      "xai_explanation_available": false,
+      "xai_hash_logged": false
+    },
+    {
+      "audit_mode": "permissioned_blockchain_style",
+      "decision_model": "abac_pbac",
+      "description": "Final proposed mode with contextual policy decisions, rule-trace XAI, explanation hash, and permissioned blockchain-style audit.",
+      "method_id": "seba_xai_full",
+      "method_name": "SEBA-XAI full: ABAC/PBAC + blockchain-style audit + XAI hash",
+      "xai_explanation_available": true,
+      "xai_hash_logged": true
+    }
+  ]
+}

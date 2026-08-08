@@ -1,0 +1,31 @@
+{
+  "artifact_hashes": {
+    "audit_detection_summary.csv": "f7432ae4bb9ece731f37b323db8d66e6b695334352e6e74271f33ff3bed74053",
+    "mutable_access_log.csv": "336faffc981558e9e2ff46bd3c6c9290d05d278d4f4707696c47837aa5df6658",
+    "signed_hash_chain_log.csv": "e735962b2ab60107b584b7a97857346fe0c10e457eb9af297796f81ea0b7b2a3",
+    "tamper_test_results.csv": "92de5a5abef30cf957c7df0ab92ceec87e70b13b42e7f2c6c9e8146b478c4b74"
+  },
+  "audit_log_version": "AUDIT-2026-05-STEP3",
+  "blockchain_implemented": false,
+  "created_at_utc": "2026-06-06T18:48:10.884683Z",
+  "input_file": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260528_step2_policy_oracle_seed21/artifacts/labeled_access_requests.csv",
+  "input_file_sha256": "12ac13544c273d0cf65293ca9bc9af3f0f503f9614add16e12f59abef1ace17b",
+  "notes": [
+    "This is a local audit-baseline run, not a blockchain implementation.",
+    "Mutable log verification is schema-only and cannot internally detect valid-looking tampered rows.",
+    "Signed hash-chain verification uses deterministic demo HMAC signatures for reproducibility."
+  ],
+  "raw_record_included": false,
+  "run_id": "20260528_step3_audit_baselines_seed21",
+  "synthetic_only": true,
+  "tampered_artifact_hashes": {
+    "mutable/changed_decision": "89787c300654912fe91dab64df8a213fb0dafa31b3c238a11b363659a6763a6f",
+    "mutable/changed_explanation_hash": "4fe302772b8fd649b1cf208d61947f46f4a0ce39f4d9936c107b840a6caa6dbe",
+    "mutable/deleted_event": "a809ec5cd379c43f26860be148289d1814a0685b9226ab782f878b3e047c86f6",
+    "mutable/reordered_events": "b0c238ed1ac18daedb2015508c15916c0e9fbe8c08fd853396335938ce3e7134",
+    "signed_hash_chain/changed_decision": "21ad5b78fe6874e946a1bf41ea0a875e81639579707fcfc200e4ce6b57f419ea",
+    "signed_hash_chain/changed_explanation_hash": "f2f60ca3a27d318dd20e3509ed2ed869274b087a8760fb965fdc95bc3b4284c3",
+    "signed_hash_chain/deleted_event": "ce90dec9e079fd8a2eaef62a3d757aec51e9c378dd0d881633e7b68d54159efe",
+    "signed_hash_chain/reordered_events": "29aaa9f7f996b6135db4a85f5029092d9d5e542397ab78fd98f17f96ef7214f5"
+  }
+}

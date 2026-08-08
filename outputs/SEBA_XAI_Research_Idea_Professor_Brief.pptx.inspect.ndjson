@@ -1,0 +1,110 @@
+{"kind":"deck","id":"pr/uucjd4","name":"Deck"}
+{"kind":"layout","layoutId":"2ac11571-8756-4c37-9443-44f4dd6a81fa","name":"Master","type":"master"}
+{"kind":"layout","layoutId":"3601cbd3-00c2-4532-9f89-49aa3a261f4e","name":"Title Slide","type":"title"}
+{"kind":"slide","id":"sl/8a0n8e","slide":1,"title":"Research Idea","textShapes":8}
+{"kind":"textbox","id":"sh/83itgfml","slide":1,"text":"Research Idea","textPreview":"Research Idea","textChars":13,"textLines":1,"bbox":[42,38,360,28]}
+{"kind":"textbox","id":"sh/fil0rqd4","slide":1,"text":"SEBA-XAI","textPreview":"SEBA-XAI","textChars":8,"textLines":1,"bbox":[42,170,560,96]}
+{"kind":"textbox","id":"sh/qxs72x4n","slide":1,"text":"Secure, Explainable, Blockchain-Audited access governance for sensitive inter-agency police data sharing.","textPreview":"Secure, Explainable, Blockchain-Audited access governance for sensitive inter-agency police data sharing.","textChars":105,"textLines":1,"bbox":[42,282,700,92]}
+{"kind":"shape","id":"sh/x0nuxc3y","slide":1,"bbox":[845,120,320,420]}
+{"kind":"textbox","id":"sh/4fu18jqh","slide":1,"text":"Not the idea","textPreview":"Not the idea","textChars":12,"textLines":1,"bbox":[886,168,240,34]}
+{"kind":"textbox","id":"sh/fu18jqh0","slide":1,"text":"Replacing CCTNS/ICJS\nPredicting criminals\nPutting raw records on-chain\nClaiming live deployment","textPreview":"Replacing CCTNS/ICJS | Predicting criminals | Putting raw records on-chain | Claiming live deployment","textChars":95,"textLines":4,"bbox":[886,224,240,180]}
+{"kind":"shape","id":"sh/m94fu18j","slide":1,"bbox":[42,500,640,72]}
+{"kind":"textbox","id":"sh/xc3ylc7u","slide":1,"text":"Actual focus: access decisions that can be controlled, audited, and explained later.","textPreview":"Actual focus: access decisions that can be controlled, audited, and explained later.","textChars":84,"textLines":1,"bbox":[68,518,588,36]}
+{"kind":"textbox","id":"sh/4r65wjud","slide":1,"text":"SEBA-XAI | research idea brief","textPreview":"SEBA-XAI | research idea brief","textChars":30,"textLines":1,"bbox":[42,676,360,24]}
+{"kind":"textbox","id":"sh/ap4r65wj","slide":1,"text":"01","textPreview":"01","textChars":2,"textLines":1,"bbox":[1190,676,48,24]}
+{"kind":"notes","id":"nt/8a0n8e","slide":1,"text":""}
+{"kind":"slide","id":"sl/x6kemd","slide":2,"title":"Problem","textShapes":12}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":2,"text":"Problem","textPreview":"Problem","textChars":7,"textLines":1,"bbox":[42,36,360,24]}
+{"kind":"textbox","id":"sh/w7mp0bi9","slide":2,"text":"Police records are not ordinary data","textPreview":"Police records are not ordinary data","textChars":36,"textLines":1,"bbox":[42,76,920,92]}
+{"kind":"textbox","id":"sh/psfil0rq","slide":2,"text":"A broad role such as police officer is too weak for sensitive inter-agency access decisions.","textPreview":"A broad role such as police officer is too weak for sensitive inter-agency access decisions.","textChars":92,"textLines":1,"bbox":[42,166,820,60]}
+{"kind":"textbox","id":"sh/epkzupwb","slide":2,"text":"SEBA-XAI | research idea brief","textPreview":"SEBA-XAI | research idea brief","textChars":30,"textLines":1,"bbox":[42,676,360,24]}
+{"kind":"textbox","id":"sh/7adsji5s","slide":2,"text":"02","textPreview":"02","textChars":2,"textLines":1,"bbox":[1190,676,48,24]}
+{"kind":"shape","id":"sh/wval87ed","slide":2,"bbox":[42,276,354,234]}
+{"kind":"textbox","id":"sh/pg3ex0nu","slide":2,"text":"Sensitive records","textPreview":"Sensitive records","textChars":17,"textLines":1,"bbox":[64,296,310,34]}
+{"kind":"textbox","id":"sh/eloj2t83","slide":2,"text":"FIR details, victim or witness data, juvenile records, forensic reports, cybercrime complaints, case diary material, evidence references, court-linked files.","textPreview":"FIR details, victim or witness data, juvenile records, forensic reports, cybercrime complaints, case diary material, evidence references,...","textChars":157,"textLines":1,"bbox":[64,340,310,150]}
+{"kind":"shape","id":"sh/36hcrmhk","slide":2,"bbox":[462,276,354,234]}
+{"kind":"textbox","id":"sh/fil0rqd4","slide":2,"text":"Realistic requesters","textPreview":"Realistic requesters","textChars":20,"textLines":1,"bbox":[484,296,310,34]}
+{"kind":"textbox","id":"sh/qxs72x4n","slide":2,"text":"Investigating officer, ranked/supervisory officer, forensic expert, lab specialist, prosecutor or court authority, auditor.","textPreview":"Investigating officer, ranked/supervisory officer, forensic expert, lab specialist, prosecutor or court authority, auditor.","textChars":123,"textLines":1,"bbox":[484,340,310,150]}
+{"kind":"shape","id":"sh/xobm58z2","slide":2,"bbox":[882,276,354,234]}
+{"kind":"textbox","id":"sh/83itgfml","slide":2,"text":"Decision context","textPreview":"Decision context","textChars":16,"textLines":1,"bbox":[904,296,310,34]}
+{"kind":"textbox","id":"sh/fu18jqh0","slide":2,"text":"Role alone is not enough. The decision depends on jurisdiction, case assignment, purpose, sensitivity, approval state, credential status, and emergency context.","textPreview":"Role alone is not enough. The decision depends on jurisdiction, case assignment, purpose, sensitivity, approval state, credential status,...","textChars":160,"textLines":1,"bbox":[904,340,310,150]}
+{"kind":"shape","id":"sh/m94fu18j","slide":2,"bbox":[42,548,1194,66]}
+{"kind":"textbox","id":"sh/x0nuxc3y","slide":2,"text":"Research question: decide allow, deny, or escalate access, then preserve reviewable decision evidence.","textPreview":"Research question: decide allow, deny, or escalate access, then preserve reviewable decision evidence.","textChars":102,"textLines":1,"bbox":[68,566,1140,28]}
+{"kind":"notes","id":"nt/x6kemd","slide":2,"text":""}
+{"kind":"slide","id":"sl/xjjn4o","slide":3,"title":"Core idea","textShapes":14}
+{"kind":"textbox","id":"sh/7mp0bi9s","slide":3,"text":"Core idea","textPreview":"Core idea","textChars":9,"textLines":1,"bbox":[42,36,360,24]}
+{"kind":"textbox","id":"sh/w7mp0bi9","slide":3,"text":"Three pillars work together","textPreview":"Three pillars work together","textChars":27,"textLines":1,"bbox":[42,76,920,92]}
+{"kind":"textbox","id":"sh/psfil0rq","slide":3,"text":"The novelty is not one technology alone. The idea is their controlled integration around access governance.","textPreview":"The novelty is not one technology alone. The idea is their controlled integration around access governance.","textChars":107,"textLines":1,"bbox":[42,166,820,60]}
+{"kind":"textbox","id":"sh/epkzupwb","slide":3,"text":"SEBA-XAI | research idea brief","textPreview":"SEBA-XAI | research idea brief","textChars":30,"textLines":1,"bbox":[42,676,360,24]}
+{"kind":"textbox","id":"sh/7adsji5s","slide":3,"text":"03","textPreview":"03","textChars":2,"textLines":1,"bbox":[1190,676,48,24]}
+{"kind":"shape","id":"sh/wval87ed","slide":3,"bbox":[92,268,300,260]}
+{"kind":"textbox","id":"sh/pg3ex0nu","slide":3,"text":"1","textPreview":"1","textChars":1,"textLines":1,"bbox":[116,284,56,56]}
+{"kind":"textbox","id":"sh/eloj2t83","slide":3,"text":"Security and access control","textPreview":"Security and access control","textChars":27,"textLines":1,"bbox":[116,360,240,58]}
+{"kind":"textbox","id":"sh/36hcrmhk","slide":3,"text":"RBAC + ABAC + PBAC-style rules decide allow, deny, or escalate.","textPreview":"RBAC + ABAC + PBAC-style rules decide allow, deny, or escalate.","textChars":63,"textLines":1,"bbox":[116,436,230,74]}
+{"kind":"shape","id":"sh/fil0rqd4","slide":3,"bbox":[490,268,300,260]}
+{"kind":"textbox","id":"sh/qxs72x4n","slide":3,"text":"2","textPreview":"2","textChars":1,"textLines":1,"bbox":[514,284,56,56]}
+{"kind":"textbox","id":"sh/xobm58z2","slide":3,"text":"Blockchain audit layer","textPreview":"Blockchain audit layer","textChars":22,"textLines":1,"bbox":[514,360,230,58]}
+{"kind":"textbox","id":"sh/83itgfml","slide":3,"text":"Stores request IDs, policy versions, hashes, approvals, and audit commitments.","textPreview":"Stores request IDs, policy versions, hashes, approvals, and audit commitments.","textChars":78,"textLines":1,"bbox":[514,436,230,84]}
+{"kind":"shape","id":"sh/fu18jqh0","slide":3,"bbox":[888,268,300,260]}
+{"kind":"textbox","id":"sh/m94fu18j","slide":3,"text":"3","textPreview":"3","textChars":1,"textLines":1,"bbox":[912,284,56,56]}
+{"kind":"textbox","id":"sh/x0nuxc3y","slide":3,"text":"Explainable AI artifacts","textPreview":"Explainable AI artifacts","textChars":24,"textLines":1,"bbox":[912,360,240,58]}
+{"kind":"textbox","id":"sh/4fu18jqh","slide":3,"text":"Records reason code, decisive attributes, policy version, and explanation hash.","textPreview":"Records reason code, decisive attributes, policy version, and explanation hash.","textChars":79,"textLines":1,"bbox":[912,436,230,84]}
+{"kind":"notes","id":"nt/xjjn4o","slide":3,"text":""}
+{"kind":"slide","id":"sl/c5mdso","slide":4,"title":"System flow","textShapes":17}
+{"kind":"textbox","id":"sh/fil0rqd4","slide":4,"text":"System flow","textPreview":"System flow","textChars":11,"textLines":1,"bbox":[42,36,360,24]}
+{"kind":"textbox","id":"sh/83itgfml","slide":4,"text":"What happens when access is requested","textPreview":"What happens when access is requested","textChars":37,"textLines":1,"bbox":[42,76,920,92]}
+{"kind":"textbox","id":"sh/xobm58z2","slide":4,"text":"Raw sensitive records stay with the agency. The shared layer stores evidence and commitments, not the full record.","textPreview":"Raw sensitive records stay with the agency. The shared layer stores evidence and commitments, not the full record.","textChars":114,"textLines":1,"bbox":[42,166,820,60]}
+{"kind":"textbox","id":"sh/m94fu18j","slide":4,"text":"SEBA-XAI | research idea brief","textPreview":"SEBA-XAI | research idea brief","textChars":30,"textLines":1,"bbox":[42,676,360,24]}
+{"kind":"textbox","id":"sh/fu18jqh0","slide":4,"text":"04","textPreview":"04","textChars":2,"textLines":1,"bbox":[1190,676,48,24]}
+{"kind":"shape","id":"sh/4fu18jqh","slide":4,"bbox":[42,286,242,174]}
+{"kind":"textbox","id":"sh/x0nuxc3y","slide":4,"text":"Access request","textPreview":"Access request","textChars":14,"textLines":1,"bbox":[64,306,198,34]}
+{"kind":"textbox","id":"sh/mlkjm1cf","slide":4,"text":"Requester, record, action, purpose, context","textPreview":"Requester, record, action, purpose, context","textChars":43,"textLines":1,"bbox":[64,350,198,90]}
+{"kind":"textbox","id":"sh/f6dcbulw","slide":4,"text":">","textPreview":">","textChars":1,"textLines":1,"bbox":[302,350,42,42]}
+{"kind":"shape","id":"sh/vixczed8","slide":4,"bbox":[346,286,242,174]}
+{"kind":"textbox","id":"sh/2x4nap4r","slide":4,"text":"Policy service","textPreview":"Policy service","textChars":14,"textLines":1,"bbox":[368,306,198,34]}
+{"kind":"textbox","id":"sh/donyd0z6","slide":4,"text":"RBAC/ABAC/PBAC rules produce allow, deny, escalate","textPreview":"RBAC/ABAC/PBAC rules produce allow, deny, escalate","textChars":50,"textLines":1,"bbox":[368,350,198,90]}
+{"kind":"textbox","id":"sh/k3q5o7qp","slide":4,"text":">","textPreview":">","textChars":1,"textLines":1,"bbox":[606,350,42,42]}
+{"kind":"shape","id":"sh/val87ed8","slide":4,"bbox":[650,286,242,174]}
+{"kind":"textbox","id":"sh/6psfil0r","slide":4,"text":"XAI service","textPreview":"XAI service","textChars":11,"textLines":1,"bbox":[672,306,198,34]}
+{"kind":"textbox","id":"sh/dcbulwva","slide":4,"text":"Reason code, decisive attributes, counterfactual note","textPreview":"Reason code, decisive attributes, counterfactual note","textChars":53,"textLines":1,"bbox":[672,350,198,90]}
+{"kind":"textbox","id":"sh/kre1w7mp","slide":4,"text":">","textPreview":">","textChars":1,"textLines":1,"bbox":[910,350,42,42]}
+{"kind":"shape","id":"sh/v6psfil0","slide":4,"bbox":[954,286,242,174]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":4,"text":"Audit layer","textPreview":"Audit layer","textChars":11,"textLines":1,"bbox":[976,306,198,34]}
+{"kind":"textbox","id":"sh/ap4r65wj","slide":4,"text":"Hash-chain or permissioned blockchain-style evidence","textPreview":"Hash-chain or permissioned blockchain-style evidence","textChars":52,"textLines":1,"bbox":[976,350,198,90]}
+{"kind":"shape","id":"sh/za1gvy90","slide":4,"bbox":[134,512,1012,82]}
+{"kind":"textbox","id":"sh/svu9knih","slide":4,"text":"Off-chain principle: raw records stay with agencies.\nLedger stores hashes, policy IDs, approvals, and XAI commitments.","textPreview":"Off-chain principle: raw records stay with agencies. | Ledger stores hashes, policy IDs, approvals, and XAI commitments.","textChars":118,"textLines":2,"bbox":[162,528,960,48]}
+{"kind":"notes","id":"nt/c5mdso","slide":4,"text":""}
+{"kind":"slide","id":"sl/luioqv","slide":5,"title":"Prototype and evaluation","textShapes":13}
+{"kind":"textbox","id":"sh/ap4r65wj","slide":5,"text":"Prototype and evaluation","textPreview":"Prototype and evaluation","textChars":24,"textLines":1,"bbox":[42,36,360,24]}
+{"kind":"textbox","id":"sh/hgn29gr2","slide":5,"text":"What has been built for testing","textPreview":"What has been built for testing","textChars":31,"textLines":1,"bbox":[42,76,920,92]}
+{"kind":"textbox","id":"sh/svu9knih","slide":5,"text":"The current evidence is synthetic and reproducible. It supports prototype claims, not real deployment claims.","textPreview":"The current evidence is synthetic and reproducible. It supports prototype claims, not real deployment claims.","textChars":109,"textLines":1,"bbox":[42,166,820,60]}
+{"kind":"textbox","id":"sh/zidonyd0","slide":5,"text":"SEBA-XAI | research idea brief","textPreview":"SEBA-XAI | research idea brief","textChars":30,"textLines":1,"bbox":[42,676,360,24]}
+{"kind":"textbox","id":"sh/a1gvy90j","slide":5,"text":"05","textPreview":"05","textChars":2,"textLines":1,"bbox":[1190,676,48,24]}
+{"kind":"shape","id":"sh/hoza1gvy","slide":5,"bbox":[42,264,360,178]}
+{"kind":"textbox","id":"sh/s36hcrmh","slide":5,"text":"Workload","textPreview":"Workload","textChars":8,"textLines":1,"bbox":[64,284,316,34]}
+{"kind":"textbox","id":"sh/3m94fu18","slide":5,"text":"Synthetic inter-agency access requests with officer, record, purpose, jurisdiction, approval, and sensitivity attributes.","textPreview":"Synthetic inter-agency access requests with officer, record, purpose, jurisdiction, approval, and sensitivity attributes.","textChars":121,"textLines":1,"bbox":[64,328,316,94]}
+{"kind":"shape","id":"sh/a5gbq1or","slide":5,"bbox":[460,264,360,178]}
+{"kind":"textbox","id":"sh/kf6dcbul","slide":5,"text":"Comparisons","textPreview":"Comparisons","textChars":11,"textLines":1,"bbox":[482,284,316,34]}
+{"kind":"textbox","id":"sh/d0z61032","slide":5,"text":"RBAC baseline, ABAC/PBAC oracle, mutable log, signed hash chain, blockchain-style audit, and policy re-checking baselines.","textPreview":"RBAC baseline, ABAC/PBAC oracle, mutable log, signed hash chain, blockchain-style audit, and policy re-checking baselines.","textChars":122,"textLines":1,"bbox":[482,328,316,94]}
+{"kind":"shape","id":"sh/29gr2p8n","slide":5,"bbox":[878,264,360,178]}
+{"kind":"textbox","id":"sh/vu9knih4","slide":5,"text":"Stress tests","textPreview":"Stress tests","textChars":12,"textLines":1,"bbox":[900,284,316,34]}
+{"kind":"textbox","id":"sh/knih4byh","slide":5,"text":"Ordinary tampering, validly re-signed corrupted decisions, metadata exposure, latency, storage, ablations, and XAI audit quality.","textPreview":"Ordinary tampering, validly re-signed corrupted decisions, metadata exposure, latency, storage, ablations, and XAI audit quality.","textChars":129,"textLines":1,"bbox":[900,328,316,94]}
+{"kind":"shape","id":"sh/d8bat47y","slide":5,"bbox":[42,500,1194,84]}
+{"kind":"textbox","id":"sh/2lszqtcj","slide":5,"text":"Important finding direction","textPreview":"Important finding direction","textChars":27,"textLines":1,"bbox":[70,518,360,30]}
+{"kind":"textbox","id":"sh/v6psfil0","slide":5,"text":"Integrity-only audit can catch ordinary tampering, but a validly re-signed corrupted decision needs stronger policy/XAI review assumptions.","textPreview":"Integrity-only audit can catch ordinary tampering, but a validly re-signed corrupted decision needs stronger policy/XAI review assumptions.","textChars":139,"textLines":1,"bbox":[430,518,760,42]}
+{"kind":"notes","id":"nt/luioqv","slide":5,"text":""}
+{"kind":"slide","id":"sl/ux86di","slide":6,"title":"Discussion with professor","textShapes":10}
+{"kind":"textbox","id":"sh/yxobm58z","slide":6,"text":"Discussion with professor","textPreview":"Discussion with professor","textChars":25,"textLines":1,"bbox":[42,36,360,24]}
+{"kind":"textbox","id":"sh/5o7qpg3e","slide":6,"text":"What I need guidance on now","textPreview":"What I need guidance on now","textChars":27,"textLines":1,"bbox":[42,76,920,92]}
+{"kind":"textbox","id":"sh/g3ex0nux","slide":6,"text":"The research is ready to be positioned, but the paper framing must stay honest and publishable.","textPreview":"The research is ready to be positioned, but the paper framing must stay honest and publishable.","textChars":95,"textLines":1,"bbox":[42,166,820,60]}
+{"kind":"textbox","id":"sh/r65wjudg","slide":6,"text":"SEBA-XAI | research idea brief","textPreview":"SEBA-XAI | research idea brief","textChars":30,"textLines":1,"bbox":[42,676,360,24]}
+{"kind":"textbox","id":"sh/ylc7u54z","slide":6,"text":"06","textPreview":"06","textChars":2,"textLines":1,"bbox":[1190,676,48,24]}
+{"kind":"shape","id":"sh/9cvixcze","slide":6,"bbox":[42,250,500,290]}
+{"kind":"textbox","id":"sh/gr2p8nqx","slide":6,"text":"Contribution wording","textPreview":"Contribution wording","textChars":20,"textLines":1,"bbox":[70,276,420,36]}
+{"kind":"textbox","id":"sh/rytsvu9k","slide":6,"text":"1. Layered access-control service\n2. Blockchain-style tamper-evident audit\n3. Explainable access-decision service\n4. Synthetic benchmark with baselines and attacks","textPreview":"1. Layered access-control service | 2. Blockchain-style tamper-evident audit | 3. Explainable access-decision service | 4. Synthetic benc...","textChars":163,"textLines":4,"bbox":[70,336,420,150]}
+{"kind":"shape","id":"sh/yd0z6103","slide":6,"bbox":[618,250,620,290]}
+{"kind":"textbox","id":"sh/wb2hwfyx","slide":6,"text":"Questions to ask","textPreview":"Questions to ask","textChars":16,"textLines":1,"bbox":[646,276,440,36]}
+{"kind":"textbox","id":"sh/lwval87e","slide":6,"text":"Is the problem statement strong enough?\nShould this be framed as a prototype/evaluation paper?\nIs synthetic data acceptable for the first submission?\nWhich venue should we target?","textPreview":"Is the problem statement strong enough? | Should this be framed as a prototype/evaluation paper? | Is synthetic data acceptable for the f...","textChars":179,"textLines":4,"bbox":[646,336,530,150]}
+{"kind":"shape","id":"sh/e9cvixcz","slide":6,"bbox":[42,586,1194,42]}
+{"kind":"textbox","id":"sh/3q5o7qpg","slide":6,"text":"Boundary: no real CCTNS/ICJS deployment, no real police records, no legal-compliance claim, no crime-prediction claim.","textPreview":"Boundary: no real CCTNS/ICJS deployment, no real police records, no legal-compliance claim, no crime-prediction claim.","textChars":118,"textLines":1,"bbox":[68,596,1142,24]}
+{"kind":"notes","id":"nt/ux86di","slide":6,"text":""}

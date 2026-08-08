@@ -1,0 +1,56 @@
+{
+  "run_id": "20260710_hyperledger_fabric_setup",
+  "created_at_local": "2026-07-10 19:30 IST",
+  "artifact_type": "actual_hyperledger_fabric_test_network_run",
+  "scope": "Mac local setup and SEBA-XAI commitment-only audit event submission",
+  "runtime": {
+    "host": "macOS Apple Silicon",
+    "container_runtime": "Colima",
+    "docker_client": "Docker version 29.6.1",
+    "docker_server": "Docker server 29.5.2",
+    "docker_compose": "Docker Compose version v2.40.2-desktop.1",
+    "colima": "0.10.3"
+  },
+  "fabric": {
+    "samples_dir": "/Users/venkatrayudu/Workspace/Research/seba_fabric_workspace/fabric-samples",
+    "channel": "seba",
+    "chaincode": "seba-audit",
+    "chaincode_version": "1.0",
+    "organizations": ["Org1MSP", "Org2MSP"],
+    "network_type": "Hyperledger Fabric permissioned test network"
+  },
+  "inputs": {
+    "source_policy_output": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step2_policy_oracle_seed42/artifacts/labeled_access_requests.csv",
+    "prepared_events": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/fabric_audit_chain/runs/20260710_fabric_audit_event_prep/artifacts/fabric_audit_events.jsonl",
+    "validation_report": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/fabric_audit_chain/runs/20260710_fabric_audit_event_prep/artifacts/validation_report.json"
+  },
+  "results": {
+    "events_prepared": 25,
+    "events_validated": 25,
+    "events_submitted": 25,
+    "decision_counts": {
+      "allow": 3,
+      "deny": 8,
+      "escalate": 14
+    },
+    "raw_records_on_chain": false,
+    "elapsed_ms": 50650.769250000005,
+    "p50_submit_latency_ms": 2023.0471659999967,
+    "p95_submit_latency_ms": 2027.8055830000003,
+    "first_request_id_hash": "f02dea6f047664266cb38f7289c300a3e2c4bb5d36154341096002448c918bd3",
+    "first_fabric_tx_id": "594199f53df43cf8b5c1f43250a9ee3232fcf182e36f530c914beafc7a33d336",
+    "first_event_commitment_hash": "90c6caf2d3a7f82f66b89ad39ee11eb73a989bfc587046009580ccea73269835"
+  },
+  "evidence_artifacts": {
+    "submit_results": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/fabric_audit_chain/runs/20260710_fabric_submit/artifacts/fabric_submit_results.json",
+    "query_first_event": "/Users/venkatrayudu/Workspace/Research/codex research/prototype/fabric_audit_chain/runs/20260710_fabric_query/artifacts/query_first_event.json",
+    "summary_table": "/Users/venkatrayudu/Workspace/Research/codex research/results/tables/fabric_actual_setup_summary.csv",
+    "iteration_report": "/Users/venkatrayudu/Workspace/Research/codex research/reports/iteration/iter_058_hyperledger_fabric_mac_setup.md"
+  },
+  "limitations": [
+    "This is a local Fabric test-network run, not a production police deployment.",
+    "No real police, FIR, CCTNS, or ICJS records were used.",
+    "The current experiment commits hashes and audit metadata only; it does not benchmark a production consensus configuration.",
+    "Latency values are machine-local test-network measurements and should not be generalized to real agencies."
+  ]
+}

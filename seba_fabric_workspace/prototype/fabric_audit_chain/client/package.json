@@ -1,0 +1,16 @@
+{
+  "name": "seba-xai-fabric-audit-client",
+  "version": "0.1.0",
+  "description": "Fabric Gateway client for submitting SEBA-XAI audit commitments",
+  "main": "submit_audit_events.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "lint:syntax": "node --check submit_audit_events.js && node --check query_audit_event.js"
+  },
+  "dependencies": {
+    "@grpc/grpc-js": "^1.10.0",
+    "@hyperledger/fabric-gateway": "^1.7.0"
+  }
+}

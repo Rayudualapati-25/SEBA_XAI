@@ -1,0 +1,59 @@
+profile_group,value,count
+request.scenario_type,court_request,88
+request.scenario_type,cross_jurisdiction_sensitive,156
+request.scenario_type,emergency_override,75
+request.scenario_type,expired_approval_token,52
+request.scenario_type,juvenile_sensitive,94
+request.scenario_type,normal_in_jurisdiction,193
+request.scenario_type,random_context,77
+request.scenario_type,revoked_credential,69
+request.scenario_type,sealed_record,85
+request.scenario_type,stale_case_assignment,111
+request.cross_jurisdiction,false,221
+request.cross_jurisdiction,true,779
+request.approval_token_status,EXPIRED,52
+request.approval_token_status,MISSING,389
+request.approval_token_status,NOT_REQUIRED,241
+request.approval_token_status,PRESENT_VALID,318
+request.purpose,AUDIT,42
+request.purpose,COURT_PRODUCTION,84
+request.purpose,EMERGENCY_RESPONSE,81
+request.purpose,FORENSIC_REVIEW,94
+request.purpose,INVESTIGATION,473
+request.purpose,PROSECUTION_REVIEW,94
+request.purpose,SUPERVISION,115
+request.purpose,TRAINING,17
+request.action,APPROVE,32
+request.action,DOWNLOAD,143
+request.action,SHARE,54
+request.action,UPDATE,44
+request.action,VIEW,727
+request.record_sensitivity_level,CLASSIFIED,266
+request.record_sensitivity_level,HIGH,425
+request.record_sensitivity_level,LOW,81
+request.record_sensitivity_level,MEDIUM,228
+officer.credential_status,ACTIVE,218
+officer.credential_status,REVOKED,12
+officer.credential_status,SUSPENDED,10
+officer.role,Constable,51
+officer.role,Cybercrime Officer,23
+officer.role,Forensic Officer,22
+officer.role,Head Constable,36
+officer.role,Inspector,38
+officer.role,Prosecutor Liaison,9
+officer.role,Senior Superintendent,8
+officer.role,Station House Officer,13
+officer.role,Sub-Inspector,40
+record.record_type,CASE_DIARY,119
+record.record_type,COURT_SUBMISSION,85
+record.record_type,CYBERCRIME_COMPLAINT,70
+record.record_type,EVIDENCE_MEDIA,107
+record.record_type,FIR_SUMMARY,102
+record.record_type,FORENSIC_REPORT,112
+record.record_type,JUVENILE_RECORD,106
+record.record_type,VICTIM_RECORD,108
+record.record_type,WITNESS_STATEMENT,91
+record.sensitivity_level,CLASSIFIED,248
+record.sensitivity_level,HIGH,463
+record.sensitivity_level,LOW,43
+record.sensitivity_level,MEDIUM,146
