@@ -1,0 +1,20 @@
+# Generated crypto material and channel artifacts
+network/organizations/peerOrganizations/
+network/organizations/ordererOrganizations/
+network/organizations/fabric-ca/
+network/channel-artifacts/
+
+# Bootstrap logs
+.bootstrap-logs/
+
+# Node
+node_modules/
+coverage/
+
+# Wallets and local state (never commit identities)
+backend/wallets/
+*.sqlite
+*.db
+
+# Generated during ledger inspection
+.blockdemo/

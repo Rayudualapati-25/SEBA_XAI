@@ -1,0 +1,139 @@
+/**
+ * App shell: header, sidebar, content area, and the login screen.
+ * Component styling lives in components.css.
+ */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* ---------- header ---------- */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 24px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 20;
+}
+
+.brand { display: flex; align-items: center; gap: 12px; }
+
+.brand small, .who small { display: block; color: var(--muted); font-size: 12px; }
+
+.session { display: flex; align-items: center; gap: 16px; }
+.who { text-align: right; }
+
+/* ---------- body: sidebar + content ---------- */
+
+.app-body {
+  display: flex;
+  flex: 1;
+  align-items: flex-start;
+}
+
+.sidebar {
+  width: var(--sidebar-w);
+  flex: 0 0 var(--sidebar-w);
+  padding: 20px 12px;
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 61px;
+  align-self: stretch;
+}
+
+.nav-group { margin-bottom: 22px; }
+
+.nav-group-title {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  color: var(--muted);
+  padding: 0 10px 8px;
+}
+
+.nav-link {
+  display: block;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  font-size: 14px;
+  border-left: 2px solid transparent;
+}
+
+.nav-link:hover { background: var(--panel); text-decoration: none; }
+
+.nav-link.active {
+  background: var(--panel-2);
+  border-left-color: var(--accent);
+  color: #fff;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;              /* lets wide tables scroll instead of stretching */
+  padding: 24px;
+  max-width: 1220px;
+}
+
+/* ---------- module header ---------- */
+
+.module-head { margin-bottom: var(--gap); }
+.module-head h1 { font-size: 20px; }
+.module-summary { color: var(--muted); font-size: 14px; margin-top: 4px; }
+
+/* ---------- login ---------- */
+
+.login-wrap {
+  max-width: 440px;
+  margin: 8vh auto;
+  padding: 0 20px;
+}
+
+.login-wrap h1 { font-size: 22px; margin-bottom: 6px; }
+.login-wrap > .hint { margin-bottom: 24px; }
+
+.demo-users {
+  margin-top: 18px;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.demo-users h3 {
+  font-size: 11px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .6px;
+  margin-bottom: 10px;
+}
+
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; }
+
+/* ---------- narrow screens ---------- */
+
+@media (max-width: 860px) {
+  .app-body { flex-direction: column; }
+  .sidebar {
+    width: 100%;
+    flex: none;
+    position: static;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 18px;
+    overflow-x: auto;
+    padding: 12px;
+  }
+  .nav-group { margin: 0; display: flex; align-items: center; gap: 4px; }
+  .nav-group-title { padding: 0 6px 0 0; white-space: nowrap; }
+  .nav-link { white-space: nowrap; border-left: none; border-bottom: 2px solid transparent; }
+  .nav-link.active { border-left: none; border-bottom-color: var(--accent); }
+  .content { padding: 16px; }
+}

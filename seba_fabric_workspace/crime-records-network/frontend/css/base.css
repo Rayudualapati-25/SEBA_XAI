@@ -1,0 +1,73 @@
+/**
+ * Reset, design tokens, and element defaults.
+ *
+ * Change a colour or spacing value HERE, not inside a component. Every other
+ * stylesheet refers to these variables.
+ */
+
+:root {
+  /* surfaces */
+  --bg: #0e1116;
+  --panel: #161b22;
+  --panel-2: #1c232c;
+  --border: #2a313c;
+
+  /* text */
+  --text: #e6edf3;
+  --muted: #8b98a5;
+
+  /* meaning */
+  --accent: #4c8dff;
+  --allow: #3fb950;
+  --deny: #f85149;
+  --escalate: #d29922;
+
+  /* shape and rhythm */
+  --radius: 10px;
+  --radius-sm: 7px;
+  --gap: 20px;
+  --pad: 18px;
+  --sidebar-w: 232px;
+
+  --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+* { box-sizing: border-box; }
+
+/* An author `display` rule outranks the browser's [hidden] rule, so hidden
+   elements need this to actually stay hidden. */
+[hidden] { display: none !important; }
+
+html, body { height: 100%; }
+
+body {
+  margin: 0;
+  font: 15px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+
+h1, h2, h3, h4 { margin: 0; font-weight: 600; line-height: 1.3; }
+p { margin: 0; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code, .mono { font-family: var(--mono); font-size: 12px; }
+
+pre {
+  margin: 10px 0 0;
+  padding: 12px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  overflow-x: auto;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+
+/* Focus that is visible without being ugly. */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
