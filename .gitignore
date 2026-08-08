@@ -51,3 +51,16 @@ prototype/runs/*
 
 # Local LaTeX build outputs from compiling the Overleaf source.
 papers/overleaf_ieee_journal/main.pdf
+
+# Node dependencies (reinstallable; never publish)
+node_modules/
+
+# SQLite write-ahead-log sidecars. `*.sqlite` alone does not cover these, and
+# they hold recent database content (record payloads, account hashes, access log).
+*.sqlite-shm
+*.sqlite-wal
+*.db-shm
+*.db-wal
+
+# Local runtime state from the Fabric implementation
+seba_fabric_workspace/crime-records-network/.smoke-offchain/
