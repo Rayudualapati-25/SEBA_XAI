@@ -77,3 +77,7 @@ Learn/solidity-practice/
 # part of this repository.
 seba_fabric_workspace/fabric-samples/
 seba_fabric_workspace/prototype/fabric_audit_chain/.local/
+
+# Superseded submission package (kept locally; current paper and results replace it)
+professor_package_2026-06-26/
+SEBA_XAI_Professor_Package_2026-06-26.zip

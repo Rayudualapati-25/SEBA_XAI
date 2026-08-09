@@ -43,7 +43,55 @@ auditability, security, and explainable-decision paper.
 | `papers/seba_xai_ieee_journal_overleaf.zip` | Uploadable Overleaf zip. |
 | `papers/target_venue_shortlist.csv` | Current venue shortlist. |
 | `sources/` | Source logs, literature inventory, dataset inventory, and local paper-reference folders. |
-| `blockchain_xai_course/` | Learning syllabus, notes, labs, and PDFs for blockchain/XAI/prototype fundamentals. |
+| `seba_fabric_workspace/crime-records-network/` | **Live Hyperledger Fabric implementation.** Five department organisations, three chaincode contracts, REST API, web interface, measurement scripts. Has its own `README.md`. |
+| `seba_fabric_workspace/prototype/` | Earlier Python prototype and its run artifacts, cited for provenance by several result tables. |
+| `Learn/` | Learning material only: blockchain/XAI course notes, Solidity practice, offline Fabric documentation. Not cited by the paper. |
+
+## Live Fabric Implementation
+
+`seba_fabric_workspace/crime-records-network/` addresses the limitation stated in
+Section V of the paper, that the blockchain layer was "a local permissioned audit
+simulation, not a live Hyperledger Fabric deployment."
+
+Five department organisations (police, forensics, prosecution, court, oversight)
+each run their own certificate authority and CouchDB-backed peer on Fabric
+2.5.16, with MAJORITY (3 of 5) endorsement. Access decisions, their explanation
+artifacts and integrity commitments are recorded on the ledger; record payloads
+remain in off-chain agency storage. Officer role, clearance, jurisdiction and
+case assignments are carried inside X.509 certificates and read by the chaincode
+from the signed identity rather than from request parameters.
+
+| Document | Contents |
+|---|---|
+| `crime-records-network/README.md` | Requirements and reproduction commands |
+| `crime-records-network/docs/architecture.md` | Components, the eight-rule decision flow, code map |
+| `crime-records-network/docs/evaluation.md` | Metrics, method, and limitations |
+| `crime-records-network/docs/walkthrough.md` | Demonstration procedure |
+
+Measured results, with qualifications recorded in
+`crime-records-network/experiments/results/`:
+
+| Quantity | Simulation (paper) | Live implementation |
+|---|---|---|
+| Audit build latency p50, marginal | 11.10 ms | 72.69 ms |
+| Verification latency p50 | 2.50 ms | 3.99 ms |
+| Storage per audit event | 353.50 B | 857 B |
+| Replayed attacks detected | — | 6 of 6 |
+
+Verification: 70 chaincode unit tests, 48 API integration tests against the live
+network, and an 11-step end-to-end scenario.
+
+Two qualifications that must accompany the table. The end-to-end build latency is
+2072 ms, of which 2000 ms is the orderer's configured `BatchTimeout`; the marginal
+figure above is the quantity comparable with the simulation. Storage is not
+like-for-like, because this implementation commits the full explanation artifact
+inline.
+
+An explanation layer using a locally hosted language model rewords committed
+decisions for display. The model does not make decisions: the deterministic
+chaincode policy engine decides and commits, and the generated text is validated
+against the committed artifact before display, with deterministic template
+wording used when validation fails.
 
 ## Current Prototype Components
 

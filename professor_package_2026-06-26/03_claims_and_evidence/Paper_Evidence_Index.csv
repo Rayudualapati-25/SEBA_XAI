@@ -1,6 +1,0 @@
-artifact,type,source,path
-paper_table_01_method_comparison.csv,paper_table,Baseline/proposed method comparison from Step 6.,results/tables/paper_table_01_method_comparison.csv
-paper_table_02_tamper_detection.csv,paper_table,"Controlled tamper detection from Step 3, Step 4, and Step 7.",results/tables/paper_table_02_tamper_detection.csv
-paper_table_03_metadata_exposure.csv,paper_table,Full metadata versus minimized commitment ledger exposure from Step 7.,results/tables/paper_table_03_metadata_exposure.csv
-paper_table_04_latency_storage.csv,paper_table,Local latency and storage overhead from Step 5.,results/tables/paper_table_04_latency_storage.csv
-paper_table_05_policy_ablation.csv,paper_table,Policy ablation effects from Step 8.,results/tables/paper_table_05_policy_ablation.csv
