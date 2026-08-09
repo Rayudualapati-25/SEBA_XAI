@@ -1,127 +1,173 @@
 # Crime Records Access Network
 
-A permissioned Hyperledger Fabric implementation of the SEBA-XAI access
-governance design for inter-agency police crime-record access. Five departments
-participate as separate organisations. Access decisions, their explanations, and
-integrity commitments are recorded on the ledger; raw records remain in
-agency-controlled off-chain storage.
+A working blockchain system where five police-related departments share access to
+crime records without any one of them being able to rewrite the shared history.
 
-The implementation addresses the limitation stated in Section V of the paper,
-that the blockchain layer was "a local permissioned audit simulation, not a live
-Hyperledger Fabric deployment."
+This is the real version of what the paper describes. The paper's Section V says
+its blockchain was "a local permissioned audit simulation, not a live Hyperledger
+Fabric deployment". This is the live deployment.
 
 ---
 
-## Requirements
+## What actually happens when someone requests a record
 
-| Component | Version used |
+1. An officer signs in and asks to see a case file.
+2. The rules **inside the blockchain** look at who they are (from their digital
+   ID certificate), what the record is, and why they want it.
+3. The answer is **allow**, **deny**, or **escalate** (a supervisor must decide).
+4. The answer, plus the reasons for it, is written permanently to the blockchain.
+5. If allowed, the actual file is fetched from the department's own storage — it
+   was never on the blockchain.
+
+---
+
+## Words you will need
+
+| Word | Plain meaning |
+|---|---|
+| **Hyperledger Fabric** | The blockchain software. Unlike Bitcoin, only known organisations can join. |
+| **Chaincode** | A program that runs *inside* the blockchain. Ours is written in JavaScript. Also called a smart contract. |
+| **Peer** | One department's server. It holds a full copy of the shared history and runs the chaincode. |
+| **Orderer** | Decides what order transactions happen in and packages them into blocks. |
+| **Certificate Authority (CA)** | Each department's ID-card issuer. Creates the digital certificates officers sign with. |
+| **MSP** | The rulebook saying which certificates a department accepts. It is how the network knows "this really is Police". |
+| **Channel** | The shared record the five departments write to. Ours is called `crimechannel`. |
+| **Endorsement policy** | How many departments must approve a write. Ours needs **3 of 5**. |
+| **On-chain / off-chain** | On-chain means stored in the blockchain. Off-chain means kept in the department's own database. Case files are off-chain. |
+| **Hash** | A short fingerprint of a file. Change one letter in the file and the fingerprint changes completely. |
+
+---
+
+## What you need installed
+
+| Thing | Version we used |
 |---|---|
 | Hyperledger Fabric | 2.5.16 |
 | Node.js | 22.20.0 |
-| Docker | 29.6.2 via Colima (not Docker Desktop) |
-| Ollama | 0.18.0, model `llama3.2:3b` |
+| Docker | 29.6.2, running through Colima (not Docker Desktop) |
+| Ollama (for the AI wording) | 0.18.0, model `llama3.2:3b` |
 
-Fabric binaries and Docker images are expected at `../fabric-samples`. See
-`../SETUP.md` for how that environment was installed.
+The Fabric programs and Docker images must be at `../fabric-samples`. See
+`../SETUP.md` for how that was installed.
 
-## Reproduction
+---
+
+## Running it
 
 ```bash
-make up        # 5 organisations, channel, 22 containers (~3 min)
-make deploy    # install and commit the chaincode on all five peers
-make seed      # register 13 department users with certificate attributes
-make ollama    # start the local model used for explanation wording
-make backend   # API and web interface on http://localhost:3001
+make up        # start the five departments (takes about 3 minutes)
+make deploy    # install the rules onto all five servers
+make seed      # create the 13 demo officer accounts
+make ollama    # start the local AI model
+make backend   # start the website at http://localhost:3001
 ```
 
-`make` with no target lists every available command. Sign in at
-`http://localhost:3001` with any seeded username and password `demo123`.
+Type `make` on its own to see every command.
 
-Verification:
+Open `http://localhost:3001` and sign in with any of the demo usernames. The
+password for all of them is `demo123`.
+
+### Checking it works
 
 ```bash
-make test          # 70 chaincode tests, 48 backend tests
-make smoke         # 11-step end-to-end scenario on the live network
-make inspect       # read ledger state directly
-make verify-log    # access-log integrity against on-chain anchors
+make test          # 70 smart-contract tests, 48 API tests
+make smoke         # an 11-step story from start to finish
+make inspect       # look inside the blockchain itself
+make verify-log    # check nobody edited the search history
 ```
 
-Measurement:
+### Producing the measurements
 
 ```bash
-make measure       # latency, storage, attack replay
-make evaluate      # explanation quality, template versus local model
+make measure       # speed, storage, and the attack tests
+make evaluate      # explanation quality: fixed wording vs the AI
 ```
 
 Results are written to `experiments/results/`.
 
 ---
 
-## Repository layout
+## The five departments
 
-```
-Makefile                  operational entry points
-docs/
-  architecture.md         components, decision flow, code map
-  evaluation.md           metrics, method, and limitations
-  walkthrough.md          demonstration procedure
-network/                  configtx, compose files, channel and CA scripts
-chaincode/crimerecords/   three smart contracts and their unit tests
-backend/                  REST API, Fabric gateway, off-chain store
-frontend/                 web interface (no build step; see frontend/README.md)
-experiments/              measurement scripts and generated results
-scripts/                  network lifecycle, verification, inspection
-```
+Each department is a separate organisation with its own ID-card issuer and its
+own server.
 
-## Organisations
-
-Each department is a Fabric organisation with its own certificate authority,
-MSP, and CouchDB-backed peer. Users are enrolled with role attributes embedded
-in their X.509 certificates, which the chaincode reads from the signed identity
-rather than from request parameters.
-
-| MSP | Department | Peer | CA |
+| Department | Who works there | Server port | CA port |
 |---|---|---|---|
-| `PoliceMSP` | Police and investigating agencies | 7051 | 7054 |
-| `ForensicsMSP` | Forensic Science Laboratory | 8051 | 8054 |
-| `ProsecutionMSP` | Prosecution | 9051 | 9054 |
-| `CourtMSP` | Judiciary | 10051 | 10054 |
-| `AuditMSP` | Oversight and internal affairs | 11051 | 11054 |
-| `OrdererMSP` | Consortium operator | 7050 | 12054 |
+| Police | constables, sub-inspectors, inspectors, SHOs, investigating officers | 7051 | 7054 |
+| Forensic Science Laboratory | lab analysts, lab director | 8051 | 8054 |
+| Prosecution | public prosecutors, defence counsel | 9051 | 9054 |
+| Judiciary | judges, magistrates, court clerks | 10051 | 10054 |
+| Oversight | auditors, ombudsman | 11051 | 11054 |
 
-Channel `crimechannel`, endorsement policy MAJORITY (3 of 5). The
-`evidenceDetails` private data collection is distributed to Police, Forensics and
-Court, so that a majority endorsement can be satisfied entirely by collection
-members.
+There is also an **orderer** organisation that runs the sequencing service. It has
+no officers.
 
-Certificate attributes: `role`, `rank`, `station`, `jurisdiction`, `badgeId`,
-`clearance`, `credentialStatus`, `caseAssignments`. Case assignments are
-pipe-separated because Fabric CA uses the comma as its attribute separator.
+Evidence details are shared through a **private data collection** visible only to
+Police, Forensics and the Judiciary. The other two departments see only a
+fingerprint of it.
 
-## Results summary
+### What is inside an officer's certificate
 
-| Quantity | Simulation (paper) | This implementation |
+`role`, `rank`, `station`, `jurisdiction`, `badgeId`, `clearance`,
+`credentialStatus`, and `caseAssignments`.
+
+These facts are signed into the certificate by the department's CA. The chaincode
+reads them from there, not from anything the officer typed. That is what stops
+someone claiming a rank or clearance they do not have.
+
+*(Case assignments are separated with `|` rather than commas, because Fabric's CA
+tool already uses commas to separate attributes.)*
+
+---
+
+## What we measured
+
+| Measurement | Simulated (paper) | This system |
 |---|---|---|
-| Audit build latency p50, marginal | 11.10 ms | 72.69 ms |
-| Verification latency p50 | 2.50 ms | 3.99 ms |
-| Storage per audit event | 353.50 B | 857 B |
-| Attacks detected | — | 6 of 6 |
+| Time to record a decision | 11.10 ms | 72.69 ms |
+| Time to verify one | 2.50 ms | 3.99 ms |
+| Storage per decision | 353.50 B | 857 B |
+| Attacks blocked | — | 6 of 6 |
 
-The end-to-end build latency is 2072 ms, of which 2000 ms is the orderer's
-configured `BatchTimeout`. The marginal figure above is the comparable quantity.
-Storage is not like-for-like: this implementation commits the full explanation
-artifact inline. Both caveats are recorded in
-`experiments/results/live_fabric_measurements.md`.
+The complete time to record a decision is 2072 ms. But 2000 ms of that is a
+setting we chose: the orderer waits two seconds collecting transactions before
+writing a block. The fair number to compare against the paper is the remaining
+**73 ms**. Saying "blockchain costs 2072 ms" would be misleading.
 
-## Scope and limitations
+Storage is not a like-for-like comparison either — this version stores the whole
+explanation inside each entry.
 
-- Synthetic data only. No FIR, CCTNS or ICJS records are used.
-- Single-host Docker with a single-node Raft ordering service. Latency figures do
-  not represent a distributed deployment.
-- The policy is a declared benchmark policy, not validated operational police
-  policy.
-- The compromised-signer attack from the paper's catalogue is not replayed here.
-  On a live Fabric network it requires a compromised MSP administrator key, a
-  strictly stronger assumption than in the simulation.
-- Demo accounts share a fixed password and the JWT secret defaults to a
-  development value. Not deployable as-is.
+Both points are written into
+`experiments/results/live_fabric_measurements.md` so they travel with the numbers.
+
+---
+
+## Where things are
+
+```
+Makefile                  every command
+docs/architecture.md      how the parts fit together
+docs/evaluation.md        what we measured and its limits
+docs/walkthrough.md       how to demonstrate it
+network/                  blockchain configuration and startup scripts
+chaincode/crimerecords/   the three programs that run inside the blockchain
+backend/                  the web server that talks to the blockchain
+frontend/                 the website (no build step needed)
+experiments/              measurement scripts and their results
+scripts/                  start, stop, check, inspect
+```
+
+---
+
+## What this is not
+
+- All data is synthetic. No real FIR, CCTNS or ICJS records are used.
+- It runs on one computer with a single ordering node, so the speed figures do
+  not represent a real multi-site setup.
+- The rules are our own benchmark rules, not official police policy.
+- The paper's re-signed attack is not tested here. On a real blockchain it would
+  require stealing a department administrator's key, which is a much stronger
+  assumption than the simulation makes.
+- Every demo account shares one password and the login secret has a development
+  default. This must not be deployed as it stands.

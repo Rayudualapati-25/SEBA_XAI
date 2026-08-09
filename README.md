@@ -1,178 +1,228 @@
 # SEBA-XAI: Explainable Policy-Aware Audit for Secure Inter-Agency Police Data Access Governance
 
-Research artifact for the SEBA-XAI paper. The work addresses a governance
-problem rather than a prediction problem: when a sensitive criminal-justice
-record is requested across agencies, how should the request be decided, recorded,
-and later explained to a reviewer.
+## The problem in one paragraph
 
-Job role alone is not sufficient to decide access. A sub-inspector and a
-constable may request the same case file and should not receive the same answer;
-the same officer may be permitted for one purpose and denied for another; and
-some records must remain closed to one department while another may read them.
+Police records are shared between departments: police, forensic laboratories,
+prosecutors, courts, and oversight bodies. When someone asks to see a sensitive
+record, three questions need answering. Should they be allowed to see it? Is
+there a record of that decision that nobody can quietly change afterwards? And if
+someone reviews it a year later, can they find out *why* the answer was what it
+was?
 
-The project is framed for CCTNS/ICJS-compatible Indian policing infrastructure.
-It does not replace CCTNS or ICJS, and it uses no real police records.
+This project builds and tests a system that answers all three together.
 
----
+## Why a job title is not enough
 
-## What is novel
+A sub-inspector and a constable might ask for the same case file and should not
+get the same answer. The same officer might be allowed to see a record for one
+reason and refused for another. Some records must stay closed to one department
+while another reads them freely.
 
-The literature already provides the individual building blocks: permissioned
-ledgers and blockchain audit, ABAC and XACML-style policy, off-chain storage, and
-explainable AI for high-stakes decisions. The contribution of this work is not
-any one of those mechanisms.
+So the decision cannot come from the person's job title alone. It has to consider
+who is asking, what they are asking for, why, and under what circumstances.
 
-**1. Joint evaluation in one inter-agency access-governance workflow.** Access
-control, tamper-evident audit, and explanation are normally studied separately.
-This work evaluates them together on a single CCTNS/ICJS-compatible request
-workflow, so that the interaction between them can be measured rather than
-assumed.
-
-**2. Isolating an attack that integrity checking cannot reach.** The specific gap
-the paper identifies is what happens when an audit log is *validly re-signed
-after the policy output has been corrupted*. An attacker who controls the signing
-component can alter a recorded decision and sign it again: the entry verifies
-correctly even though the decision it records was never made. Ordinary integrity
-checking passes, and the log is wrong.
-
-**3. The measured consequence.** Across five seeds of a synthetic workload, every
-integrity-based defence tested (signed hash chain, blockchain-style audit,
-CT-style log, ABAC re-execution) detects ordinary tampering at 1.00 but obtains
-**0.00** detection for the re-signed attack. Two methods that examine the
-decisions themselves rather than the log's integrity — a statistical drift
-detector over the decision log, and a trusted raw-attribute policy oracle —
-obtain **1.00** under stronger visibility assumptions.
-
-The conclusion this supports is a separation that is easy to conflate in
-practice: **integrity of the log and correctness of the decision are different
-properties, and an evaluation that measures only tamper detection has not
-measured whether decisions are right.**
-
-**4. Explanation treated as audit evidence, not presentation.** Each decision
-stores its decisive attributes, reason code, policy version, and counterfactual
-as a structured artifact hash-linked to the audit event. A reviewer can check the
-grounds of a decision without opening the underlying record.
-
-### What is deliberately not claimed
-
-NS-PI, the drift detector, is **not** an overall tamper-detection winner. Its
-severity-weighted adversarial audit score is 0.2500, against 0.7917 for the
-integrity-based defences and 1.0000 for the trusted policy oracle. Its value is
-narrower and specific: it is the only method that raises an alarm when the
-auditor can see nothing but the signed decision trace. It is a complementary
-log-only signal, not a replacement for trusted policy re-evaluation. See
-`CONTRIBUTION.md` for the evidence-locked statement and the broader claim that
-the evidence did not support.
+The project is designed for the Indian CCTNS/ICJS police systems. It does not
+replace them, and it uses no real police records — all data is synthetic
+(made-up test data).
 
 ---
 
-## Contributions, as stated in the paper
+## What is new here
 
-1. **Layered access-control service.** Combines role-based, attribute-based and
-   policy-based rules, returning *allow*, *deny* or *escalate* for inter-agency
-   record requests, so decisions follow context rather than role.
-2. **Permissioned blockchain audit layer.** Each decision event records the
-   request identifier, decision hash, explanation hash, policy version, approval
-   reference where one exists, and record commitment. Raw records remain
-   off-chain with the holding agency.
-3. **Explainable decision service.** Decisive attributes, reason code, policy
-   version and counterfactual information stored as a structured artifact
-   hash-linked to the audit event.
-4. **Reproducible adversarial benchmark.** Ordinary tampering attacks plus the
-   validly re-signed compromised-signer attack, with defences compared under
-   explicitly stated visibility assumptions.
+The individual pieces already exist in published research: blockchain for
+tamper-proof records, attribute-based access control for permissions, and
+explainable AI for justifying decisions. **We did not invent any of those.**
+
+Four things are new.
+
+### 1. Studying the three together instead of separately
+
+Most papers study access control, or audit logs, or explanations. Rarely all
+three in one workflow. When you put them together, you can measure how they
+interact — and find gaps that appear only in combination.
+
+### 2. Finding an attack that tamper-proofing cannot catch
+
+This is the core idea, and it is worth understanding properly.
+
+A tamper-proof audit log works by signing each entry. If someone edits an entry,
+the signature no longer matches, and the edit is detected.
+
+But suppose the attacker controls the component that *does the signing*. Now they
+can change a recorded decision and sign it again. The new signature is perfectly
+valid. Every integrity check passes. **The log looks fine and the decision in it
+is wrong.**
+
+Think of it as a sealed envelope. Checking the seal proves nobody opened the
+envelope. It proves nothing about whether the letter inside was true when it was
+sealed.
+
+### 3. Measuring how badly that gap matters
+
+We tested this across five runs of a synthetic workload:
+
+| Type of defence | Ordinary tampering | Re-signed attack |
+|---|---|---|
+| Signed hash chain | catches 100% | **catches 0%** |
+| Blockchain-style audit | catches 100% | **catches 0%** |
+| CT-style log | catches 100% | **catches 0%** |
+| ABAC re-execution | catches 100% | **catches 0%** |
+| Drift detector (NS-PI) | — | **catches 100%** |
+| Trusted attribute oracle | — | **catches 100%** |
+
+Every method that checks whether the log was *edited* scores zero. Only methods
+that check whether the *decision itself makes sense* catch it.
+
+The conclusion, which is easy to get wrong in practice:
+
+> **Whether a log is untampered and whether its decisions are correct are two
+> different things. Testing only for tampering does not tell you the decisions
+> are right.**
+
+### 4. Treating the explanation as evidence, not decoration
+
+Every decision stores *why* it was made — which facts decided it, the rule that
+fired, and what would have changed the outcome. That explanation is locked to the
+decision with a hash, so it cannot be swapped later. A reviewer can check the
+reasoning without opening the actual police record.
+
+### What we are careful NOT to claim
+
+NS-PI, our drift detector, is **not** the best defence overall. Its score across
+all attacks is **0.25**, compared to **0.79** for the integrity methods and
+**1.00** for the trusted oracle.
+
+It is good at exactly one thing: raising an alarm when the reviewer can see
+nothing except the signed decisions. It adds to the other methods; it does not
+replace them.
+
+We state this openly because an earlier, bigger claim was not supported by our own
+evidence. `CONTRIBUTION.md` records what that claim was and why we dropped it.
 
 ---
 
-## Live Hyperledger Fabric implementation
+## The four contributions, as written in the paper
+
+1. **A layered permission system** that combines job role, attributes (rank,
+   clearance, jurisdiction, case assignment) and policy rules, answering *allow*,
+   *deny* or *escalate* — escalate meaning "a supervisor must decide this".
+2. **A blockchain audit layer** storing, for each decision, an identifier, hashes
+   of the decision and its explanation, the policy version, any approval
+   reference, and a fingerprint of the record. The record itself stays with the
+   agency that owns it.
+3. **An explanation service** storing the deciding facts, a reason code, the
+   policy version and a counterfactual, all locked to the audit entry.
+4. **A repeatable attack benchmark** covering ordinary tampering plus the
+   re-signed attack, comparing defences under clearly stated assumptions about
+   what the reviewer can see.
+
+---
+
+## The working system
 
 `seba_fabric_workspace/crime-records-network/`
 
-The paper states in Section V that its blockchain layer is "a local permissioned
-audit simulation, not a live Hyperledger Fabric deployment." This implementation
-removes that limitation.
+The paper admits a limitation in Section V: its blockchain was **simulated**, not
+a real one. We have now built the real thing.
 
-Five department organisations — police, forensic science, prosecution,
-judiciary, and oversight — each run their own certificate authority and
-CouchDB-backed peer on Fabric 2.5.16, with MAJORITY (3 of 5) endorsement and a
-private data collection for evidence detail. Three chaincode contracts provide
-the record registry, the eight-rule access policy, and audit verification.
+Five departments — police, forensics, prosecution, judiciary, oversight — each
+run their own server and their own ID-card issuer on Hyperledger Fabric 2.5.16.
+Writing a record requires **three of the five departments to agree**, so no single
+department can write to the shared record alone.
 
-Officer role, rank, station, jurisdiction, clearance, credential status and case
-assignments are carried inside X.509 certificates issued by each department's
-certificate authority, and the chaincode reads them from the signed identity
-rather than from request parameters. Access therefore depends on cryptographic
-identity rather than on a database row that an administrator could edit.
+Each officer's role, rank, station, jurisdiction and clearance are written
+*inside their digital ID certificate*, signed by their department. The blockchain
+reads those facts from the signed certificate, not from a form the officer fills
+in. That means an officer cannot claim a rank they do not have, and an
+administrator cannot quietly change someone's clearance in a database.
 
-| Quantity | Simulation (paper) | Live implementation |
+### Measured results
+
+| What we measured | Simulated (paper) | Real system |
 |---|---|---|
-| Audit build latency p50, marginal | 11.10 ms | 72.69 ms |
-| Verification latency p50 | 2.50 ms | 3.99 ms |
-| Storage per audit event | 353.50 B | 857 B |
-| Replayed attacks detected | — | 6 of 6 |
+| Time to record a decision | 11.10 ms | 72.69 ms |
+| Time to verify one | 2.50 ms | 3.99 ms |
+| Storage per decision | 353.50 B | 857 B |
+| Attacks blocked | — | 6 out of 6 |
 
-Two qualifications belong with that table. End-to-end build latency is 2072 ms,
-of which 2000 ms is the orderer's configured `BatchTimeout`; the marginal figure
-is the quantity comparable with the simulation, and quoting the end-to-end figure
-as the cost of the audit design would be incorrect. Storage is not like-for-like,
-because this implementation commits the full explanation artifact inline.
+**Two things must be said with that table.**
 
-Verification: 70 chaincode unit tests, 48 API integration tests against the live
-network, an 11-step end-to-end scenario, and a six-attack replay.
+The full time to record a decision is 2072 ms, but 2000 ms of that is a waiting
+period we configured ourselves — the blockchain collects transactions for two
+seconds before writing a block. The honest figure to compare is the remaining
+**73 ms**. Quoting 2072 ms as "the cost of blockchain" would be wrong.
 
-Beyond the paper's design, the implementation adds a tamper-evident record of
-**reads and searches**. These are ledger queries and produce no transaction, so
-who searched for a case would otherwise leave no trace. They are recorded in a
-hash chain whose head is periodically anchored on-chain, which makes editing or
-deleting an entry detectable.
+Storage is not a fair comparison either: our version stores the full explanation
+inside each entry, so of course it is bigger.
 
-An explanation layer uses a locally hosted language model to reword committed
-decisions into plain language. The model does not participate in the decision:
-the deterministic chaincode policy engine decides and commits first, and
-generated text is validated against the committed artifact before display, with
-deterministic template wording used when validation fails.
+Checked by: 70 smart-contract tests, 48 API tests against the running system, an
+11-step full walkthrough, and a 6-attack replay. See `TESTING.md`.
 
-Documentation: `crime-records-network/README.md` for reproduction,
-`docs/architecture.md` for the decision flow and code map, `docs/evaluation.md`
-for metrics and limitations, `docs/walkthrough.md` for a demonstration sequence.
+### One thing we added beyond the paper
+
+Searching and reading do not create blockchain transactions — only writing does.
+So *who looked at a case* would leave no trace at all, which is backwards: in
+police work, who looked is often more sensitive than who wrote.
+
+We now record every search and read in a chained list where each entry contains a
+fingerprint of the one before it. Change or delete any entry and the chain breaks.
+The end of the chain is periodically written to the blockchain, so the list cannot
+be rewritten afterwards without contradicting something already permanent.
+
+### About the AI part
+
+A language model running on the local machine turns each recorded decision into a
+readable sentence.
+
+**The AI does not decide anything.** The blockchain rules decide first and record
+the decision. Only then is the AI asked to reword it. Its output is checked
+against the recorded decision before being shown, and if it says anything
+unsupported, fixed template wording is shown instead. Nothing is sent to the
+internet.
+
+### Where to read more
+
+| File | Contents |
+|---|---|
+| `crime-records-network/README.md` | How to run it |
+| `crime-records-network/docs/architecture.md` | How the parts fit together |
+| `crime-records-network/docs/evaluation.md` | What we measured and its limits |
+| `crime-records-network/docs/walkthrough.md` | How to demonstrate it |
 
 ---
 
-## Repository map
+## What is in this repository
 
 | Path | Contents |
 |---|---|
-| `00_START_HERE.md` | Orientation for the repository |
-| `CONTRIBUTION.md` | Evidence-locked contribution statement and novelty boundary |
-| `REPRODUCE.md` | Commands to reproduce the experiments |
-| `TESTING.md` | How the project is tested, in plain language, with the current results |
-| `SESSION_HANDOFF.md` | Current progress state |
-| `seba_fabric_workspace/crime-records-network/` | Live Fabric implementation |
-| `seba_fabric_workspace/prototype/` | Earlier Python prototype, code and run summaries |
-| `src/seba/` | Python research package: NS-PI, attacks, baselines, scoring, XAI quality metrics |
-| `tests/` | Python test suite |
-| `experiments/` | Experiment plan and run metadata |
-| `results/` | Result tables, plots and findings |
-| `research_pack/` | Problem framing, literature review, datasets, methodology, metrics, ethics |
-| `reports/iteration/` | Iteration-by-iteration research log |
-| `papers/` | IEEE paper: LaTeX sources, figures, supervisor memos |
-| `scripts/` | Reproduction, aggregation, figure and packaging scripts |
-| `sources/` | Literature and dataset inventories |
+| `00_START_HERE.md` | Orientation |
+| `CONTRIBUTION.md` | What we claim, and the bigger claim we dropped |
+| `REPRODUCE.md` | Commands to repeat the experiments |
+| `TESTING.md` | How the project is tested, in plain language |
+| `seba_fabric_workspace/crime-records-network/` | The working Fabric system |
+| `seba_fabric_workspace/prototype/` | The earlier Python prototype and its results |
+| `src/seba/` | Python research code: NS-PI, attacks, comparison methods, metrics |
+| `tests/` | Python tests |
+| `experiments/` | Experiment plans and run records |
+| `results/` | Result tables and findings |
+| `research_pack/` | Problem framing, literature review, methodology, ethics |
+| `reports/iteration/` | A log of each work session |
+| `papers/` | The paper itself, in LaTeX |
+| `scripts/` | Scripts that produce tables and figures |
+| `sources/` | Literature and dataset lists |
 
 ---
 
-## Reproduce
+## How to run it
 
-Python experiments:
+The Python research code:
 
 ```bash
 pip install -e ".[dev]"
 pytest
 ```
 
-See `REPRODUCE.md` for the full experiment sequence.
-
-Live Fabric implementation:
+The working blockchain system:
 
 ```bash
 cd seba_fabric_workspace/crime-records-network
@@ -180,35 +230,32 @@ make up && make deploy && make seed
 make test && make smoke
 ```
 
-`make` with no target lists every command.
+Typing `make` on its own lists every available command.
 
 ---
 
-## Scope and limitations
+## What this work does not claim
 
-- Real police access logs and records are not publicly available, so the
-  evaluation uses a reproducible synthetic workload. No claim is made about
-  performance on operational CCTNS or ICJS data.
-- The policy is a declared benchmark policy, not validated operational police
-  policy.
-- The paper's blockchain results are from a simulated permissioned ledger; the
-  live implementation in this repository is a single-host deployment with a
-  single-node ordering service, so its latency figures do not represent a
-  distributed deployment.
-- The compromised-signer attack is not replayed against the live network. There
-  it would require a compromised MSP administrator key, a strictly stronger
-  assumption than the simulation makes.
-- The metadata-exposure score is a schema-level proxy, not a formal privacy
-  proof. The explanation text-coverage metric is a weak textual proxy, not a
-  human explanation-quality score.
-- No claim is made of deployment inside an operational system, legal compliance,
-  validation on real records, or production security.
+- Real police access logs are not publicly available, so everything is tested on
+  synthetic data. We make no claim about performance on real CCTNS or ICJS data.
+- The policy rules are our own benchmark rules, not official police policy.
+- The paper's blockchain results come from a simulation. The real system here runs
+  on one computer with a single ordering node, so its timings do not represent a
+  real multi-site deployment.
+- The re-signed attack is not replayed against the real system. Doing so there
+  would require stealing a department administrator's key, which is a much
+  stronger assumption than the simulation makes.
+- The privacy score counts how many columns are hidden. It is a rough indicator,
+  not a mathematical privacy proof. The explanation score checks whether the right
+  words appear in the text; it does not judge whether a human would find the
+  explanation useful.
+- We do not claim this is ready to deploy, legally compliant, or production-secure.
 
-## Position on predictive policing
+## This is not crime prediction
 
-This work governs access to records; it does not predict crime or suspects.
-Aggregate public crime statistics are not individual-level access-control data,
-predictive policing can create feedback loops when observed crime data is shaped
-by earlier policing decisions, and complex criminal-justice prediction systems do
-not reliably outperform simple baselines. The subject is the governance of
-access, not the prediction of crime.
+This project controls **access to records**. It does not predict crimes or
+suspects. Public crime statistics are summary counts, not individual access
+records. Predictive policing can create feedback loops, because tomorrow's data
+is shaped by today's policing. And complex prediction systems in criminal justice
+often do no better than simple ones. The subject here is who may see a file, not
+who might commit a crime.
