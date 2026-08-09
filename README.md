@@ -145,6 +145,7 @@ for metrics and limitations, `docs/walkthrough.md` for a demonstration sequence.
 | `00_START_HERE.md` | Orientation for the repository |
 | `CONTRIBUTION.md` | Evidence-locked contribution statement and novelty boundary |
 | `REPRODUCE.md` | Commands to reproduce the experiments |
+| `TESTING.md` | How the project is tested, in plain language, with the current results |
 | `SESSION_HANDOFF.md` | Current progress state |
 | `seba_fabric_workspace/crime-records-network/` | Live Fabric implementation |
 | `seba_fabric_workspace/prototype/` | Earlier Python prototype, code and run summaries |
