@@ -2,6 +2,9 @@
 **/.DS_Store
 ~$*.xlsx
 
+# Presentation inspection artifacts are local tooling output.
+*.pptx.inspect.ndjson
+
 # Python build / cache artifacts
 __pycache__/
 *.py[cod]
