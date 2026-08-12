@@ -1,5 +1,0 @@
-artifact,rows,storage_bytes,bytes_per_row,note
-offchain_record_store.jsonl,900,1946654,2162.949,Encrypted synthetic payload envelopes.
-offchain_pointer_table.csv,1000,601360,601.360,Private request-to-record pointer commitments.
-full_metadata_ledger.csv,1000,581606,581.606,Overexposed ledger view for comparison.
-minimized_commitment_ledger.csv,1000,791837,791.837,Minimized commitment-based ledger view.

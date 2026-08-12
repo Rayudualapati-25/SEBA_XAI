@@ -1,6 +1,0 @@
-created_at_utc=2026-07-10T13:58:24.484522Z
-input_file=/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step2_policy_oracle_seed42/artifacts/labeled_access_requests.csv
-events_prepared=25
-decisions={'deny': 8, 'allow': 3, 'escalate': 14}
-fabric_executed=false_by_preparation_stage
-status=success

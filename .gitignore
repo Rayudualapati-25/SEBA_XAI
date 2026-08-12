@@ -84,3 +84,36 @@ seba_fabric_workspace/prototype/fabric_audit_chain/.local/
 # Superseded submission package (kept locally; current paper and results replace it)
 professor_package_2026-06-26/
 SEBA_XAI_Professor_Package_2026-06-26.zip
+
+# Local research, paper, and prototype material excluded from the two-project
+# source submission. These files remain on the local machine only.
+/00_START_HERE.md
+/CONTRIBUTION.md
+/Dockerfile
+/GLOSSARY.md
+/Learn/
+/Makefile
+/REPRODUCE.md
+/SESSION_HANDOFF.md
+/TESTING.md
+/experiments/
+/outputs/
+/papers/
+/pyproject.toml
+/reports/
+/requirements-lock.txt
+/research_pack/
+/results/
+/scripts/
+/seba-xai.code-workspace
+/sources/
+/src/
+/tests/
+/seba_fabric_workspace/PLAN.md
+/seba_fabric_workspace/SETUP.md
+/seba_fabric_workspace/bootstrap-network.sh
+/seba_fabric_workspace/install-fabric.sh
+/seba_fabric_workspace/package-lock.json
+/seba_fabric_workspace/prototype/
+/seba_fabric_workspace/seba-audit-chaincode/
+/seba_fabric_workspace/smoke-test-seba-chaincode.sh

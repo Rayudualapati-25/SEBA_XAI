@@ -1,6 +1,0 @@
-artifact_layer,design_or_artifact,tamper_cases,detected,not_detected,detection_rate,source_artifact,interpretation
-audit_log,mutable_log,4,0,4,0.0000,prototype/runs/20260527_step3_audit_baselines_seed42/artifacts/audit_detection_summary.csv,Schema-only mutable logs do not internally detect valid-looking edits.
-audit_log,signed_hash_chain,4,4,0,1.0000,prototype/runs/20260527_step3_audit_baselines_seed42/artifacts/audit_detection_summary.csv,Signed hash-chain detects the controlled edits in this local test.
-blockchain_audit,permissioned_blockchain_style,5,5,0,1.0000,prototype/runs/20260527_step4_permissioned_blockchain_audit_seed42/artifacts/blockchain_detection_summary.csv,Permissioned blockchain-style blocks detect the controlled block and commitment edits.
-offchain_storage_pointer,offchain_store,3,3,0,1.0000,prototype/runs/20260527_step7_offchain_encrypted_pointers_seed42/artifacts/offchain_tamper_test_results.csv,Anchored verification detects the controlled off-chain store or pointer edits.
-offchain_storage_pointer,pointer_table,7,7,0,1.0000,prototype/runs/20260527_step7_offchain_encrypted_pointers_seed42/artifacts/offchain_tamper_test_results.csv,Anchored verification detects the controlled off-chain store or pointer edits.

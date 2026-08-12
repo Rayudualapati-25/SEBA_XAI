@@ -1,8 +1,0 @@
-created_at_utc=2026-05-27T19:00:34.125866Z
-run_id=20260527_step6_experiment_modes_seed42
-requests=1000
-methods=5
-decision_totals={'rbac': 0.701125, 'abac_pbac': 14.152334}
-detection_evidence={'audit_rates': {'mutable_log': '0.0000', 'signed_hash_chain': '1.0000', 'permissioned_blockchain_style': '1.0000'}, 'xai_hash_detection_rate': '1.0000', 'source_files': {'step3_summary': '/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step3_audit_baselines_seed42/artifacts/audit_detection_summary.csv', 'step4_summary': '/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step4_permissioned_blockchain_audit_seed42/artifacts/blockchain_detection_summary.csv', 'step7_tamper_results': '/Users/venkatrayudu/Workspace/Research/codex research/prototype/runs/20260527_step7_offchain_encrypted_pointers_seed42/artifacts/offchain_tamper_test_results.csv'}}
-status=success
-claim=synthetic_experiment_mode_comparison_only

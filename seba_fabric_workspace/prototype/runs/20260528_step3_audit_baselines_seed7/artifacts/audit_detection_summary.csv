@@ -1,3 +1,0 @@
-log_type,tamper_cases,self_detected,self_not_detected,self_detection_rate
-mutable,4,0,4,0.0000
-signed_hash_chain,4,4,0,1.0000

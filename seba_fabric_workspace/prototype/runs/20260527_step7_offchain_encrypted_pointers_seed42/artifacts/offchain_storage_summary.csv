@@ -1,9 +1,0 @@
-metric,value,interpretation
-offchain_record_payloads,900,Synthetic record payload envelopes stored off-chain.
-request_pointer_commitments,1000,Access requests linked to off-chain payload hashes and audit blocks.
-full_metadata_clear_sensitive_columns,19,Clear contextual fields visible in the intentionally overexposed ledger view.
-minimized_metadata_clear_sensitive_columns,0,Clear contextual fields visible after commitment-based minimization.
-full_metadata_exposure_score,1.0000,Schema-level exposure score; not a formal privacy metric.
-minimized_metadata_exposure_score,0.0000,Schema-level exposure score; not a formal privacy metric.
-tamper_cases_detected,10/10,Controlled payload and pointer tampering detected by anchored local verification.
-raw_payloads_on_ledger,false,Raw synthetic payloads are kept out of both ledger views.

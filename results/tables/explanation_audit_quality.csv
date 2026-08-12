@@ -1,6 +1,0 @@
-seed,n_requests,trace_complete_rate,decisive_attribute_present_rate,decisive_attribute_text_coverage_mean,decisive_attribute_full_text_coverage_rate,counterfactual_target_count,counterfactual_generated_count,counterfactual_coverage_rate,counterfactual_validity_rate,counterfactual_mean_edits,stability_duplicate_group_count,stability_duplicate_row_count,stable_decision_reason_group_rate,stable_decision_reason_row_rate,audit_event_count,audit_request_join_rate,audit_signed_hash_match_rate,audit_block_index_join_rate,audit_commitment_in_block_rate,audit_reconstruction_rate
-7,1000,1.0,1.0,0.9231126984126984,0.755,889.0,889.0,1.0,1.0,1.5523059617547807,5.0,10.0,1.0,1.0,1000.0,1.0,1.0,1.0,1.0,1.0
-21,1000,1.0,1.0,0.92845,0.767,889.0,889.0,1.0,0.9876265466816648,1.330708661417323,7.0,14.0,1.0,1.0,1000.0,1.0,1.0,1.0,1.0,1.0
-42,1000,1.0,1.0,0.9319785714285714,0.785,887.0,887.0,1.0,1.0,1.5005636978579482,10.0,21.0,1.0,1.0,1000.0,1.0,1.0,1.0,1.0,1.0
-99,1000,1.0,1.0,0.9368857142857143,0.789,899.0,899.0,1.0,0.9944382647385984,1.578420467185762,11.0,24.0,1.0,1.0,1000.0,1.0,1.0,1.0,1.0,1.0
-123,1000,1.0,1.0,0.9347523809523809,0.809,875.0,875.0,1.0,1.0,1.3965714285714286,5.0,10.0,1.0,1.0,1000.0,1.0,1.0,1.0,1.0,1.0

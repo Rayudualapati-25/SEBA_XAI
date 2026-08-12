@@ -1,5 +1,0 @@
-component_or_method,events_or_requests,build_or_decision_total_ms_p50,verify_total_ms_p50,storage_bytes,storage_bytes_per_event_or_request,tamper_detection_rate,scope_note
-policy_oracle_xai,1000,14.461375,,1555951,1555.951,,Decision and rule-trace XAI generation only.
-mutable_log,1000,6.840958,0.685708,459815,459.815,0.0000,Schema-valid mutable log; no internal tamper-evident chain.
-signed_hash_chain,1000,16.839833,9.158000,756860,756.860,1.0000,Local signed append-only hash-chain baseline.
-permissioned_blockchain_style,1000,11.096375,2.503417,353497,353.497,1.0000,"Local permissioned PoA/PBFT-style blockchain audit simulation, not deployed Fabric."

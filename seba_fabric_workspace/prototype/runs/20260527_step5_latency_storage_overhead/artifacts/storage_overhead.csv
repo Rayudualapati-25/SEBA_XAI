@@ -1,6 +1,0 @@
-component,artifact,file_count,bytes,kilobytes,events_or_requests,bytes_per_event_or_request,note
-policy_oracle_xai,labeled_access_requests.csv,1,1555951,1519.483,1000,1555.951,"Step 2 output with decisions, rule-trace explanations, and hashes."
-mutable_log,mutable_access_log.csv,1,459815,449.038,1000,459.815,Centralized audit metadata log.
-signed_hash_chain,signed_hash_chain_log.csv,1,756860,739.121,1000,756.860,Audit log with previous-event hashes and demo signatures.
-permissioned_blockchain_style,permissioned_audit_blocks.jsonl,1,93337,91.149,1000,93.337,"Block file only, containing event commitments, Merkle roots, block links, and signatures."
-permissioned_blockchain_style,blocks_plus_index_and_validator_set,3,353497,345.212,1000,353.497,Full Step 4 audit artifact set needed to inspect event-to-block mapping.

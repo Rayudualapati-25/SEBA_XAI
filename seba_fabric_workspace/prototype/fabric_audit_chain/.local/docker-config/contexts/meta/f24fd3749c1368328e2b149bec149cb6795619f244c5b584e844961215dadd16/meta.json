@@ -1,1 +1,0 @@
-{"Name":"colima","Metadata":{},"Endpoints":{"docker":{"Host":"unix:///Users/venkatrayudu/.colima/default/docker.sock","SkipTLSVerify":false}}}
