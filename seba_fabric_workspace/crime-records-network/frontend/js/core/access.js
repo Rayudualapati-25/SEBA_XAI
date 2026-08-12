@@ -47,8 +47,35 @@ export const REVIEWER_ROLES = Object.freeze([
 /** Mirrors backend routes/records.js seal/unseal */
 export const JUDICIAL_ROLES = Object.freeze(['judge', 'magistrate']);
 
-/** Mirrors backend routes/audit.js POST '/anchor' and the experiment routes */
+/** Oversight roles used by audit-focused navigation. */
 export const OVERSIGHT_ROLES = Object.freeze(['auditor', 'ombudsman']);
+
+/**
+ * Mirrors ADMIN_ROLES_BY_MSP in chaincode/crimerecords/lib/userContract.js —
+ * the senior role in each department, the only one that may admit new users.
+ * The chaincode is what enforces this; here it only hides a form that would
+ * fail.
+ */
+export const USER_ADMIN_ROLES = Object.freeze([
+  'sho', 'lab-director', 'public-prosecutor', 'judge', 'auditor', 'ombudsman',
+]);
+
+/** Every role a new account can be given. Mirrors ROLES in policyV1.js. */
+export const ALL_ROLES = Object.freeze([
+  'constable', 'sub-inspector', 'inspector', 'sho', 'investigating-officer',
+  'lab-analyst', 'lab-director', 'public-prosecutor', 'defense-counsel',
+  'judge', 'magistrate', 'court-clerk', 'auditor', 'ombudsman',
+]);
+
+/** Which roles belong to which department, so the form cannot offer a
+ *  combination the chaincode would reject. */
+export const ROLES_BY_ORG = Object.freeze({
+  police: ['constable', 'sub-inspector', 'inspector', 'sho', 'investigating-officer'],
+  forensics: ['lab-analyst', 'lab-director'],
+  prosecution: ['public-prosecutor', 'defense-counsel'],
+  court: ['judge', 'magistrate', 'court-clerk'],
+  audit: ['auditor', 'ombudsman'],
+});
 
 /**
  * Does this user satisfy a module's `allow` rule?

@@ -1,19 +1,17 @@
 'use strict';
 
 /**
- * Records every API call in the tamper-evident access log.
+ * Records authenticated API calls directly on the Fabric ledger.
  *
  * Runs AFTER the response has been sent, so logging never slows a request down
  * and never turns a logging bug into a failed request.
  *
  * Only who/what/when is recorded — never the case narrative, the payload
- * contents, a password or a token. Search filters ARE recorded, because "who
+ * contents or a token. Search filters ARE recorded, because "who
  * went looking for this case" is exactly the signal an auditor needs.
  */
 
-const db = require('../db');
-const accessLog = require('../audit/accessLog');
-const anchor = require('../audit/anchor');
+const fabric = require('../fabric/gateway');
 
 /**
  * Map a request to a stable action name and a safe target.
@@ -121,28 +119,24 @@ function accessLogger(req, res, next) {
     body: req.body && typeof req.body === 'object' ? { ...req.body } : {},
   };
 
-  res.on('finish', () => {
+  res.on('finish', async () => {
     try {
       const described = describe(snapshot);
       if (!described) return;
 
       const user = req.user || {};
+      // Fabric needs a signing identity. Failed/anonymous logins are reported
+      // by the web server but cannot honestly be attributed on-chain.
+      if (!user.org || !user.fabricUser) return;
       const action = described.action === 'auth.login' && res.statusCode !== 200
         ? 'auth.login_failed'
         : described.action;
 
-      accessLog.append(db, {
-        actorUsername: user.username || snapshot.body.username || null,
-        actorMsp: user.org ? `${user.org}` : null,
-        actorRole: user.role || null,
-        action,
-        target: described.target,
-        outcome: outcomeFor(res.statusCode, described.action),
-        status: res.statusCode,
-      });
-
-      // Fire and forget: anchoring must not delay anything.
-      anchor.anchorNow().catch(() => {});
+      await fabric.submit(
+        user.org, user.fabricUser, 'AuditContract', 'RecordAccessEvent',
+        action, JSON.stringify(described.target),
+        outcomeFor(res.statusCode, described.action), String(res.statusCode)
+      );
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error('[accessLogger] failed to record entry:', err.message);

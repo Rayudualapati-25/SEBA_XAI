@@ -10,7 +10,6 @@
  */
 
 const express = require('express');
-const db = require('../db');
 const fabric = require('../fabric/gateway');
 const ollama = require('../llm/ollama');
 const { explainDecision } = require('../llm/explain');
@@ -34,7 +33,7 @@ router.post('/:recordId/:decisionId', asyncRoute(async (req, res) => {
     req.user.org, req.user.fabricUser, 'AccessContract', 'GetDecision',
     recordId, decisionId);
 
-  const result = await explainDecision(decisionEvent, db);
+  const result = await explainDecision(decisionEvent);
   return ok(res, {
     recordId,
     decisionId,

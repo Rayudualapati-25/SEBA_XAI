@@ -111,10 +111,15 @@ export function checkbox(name, label) {
     el('span', {}, label));
 }
 
-export function button(text, { kind = 'primary', type = 'button', onclick, small = false } = {}) {
+export function button(text, {
+  kind = 'primary', type = 'button', onclick, small = false, ariaLabel,
+} = {}) {
   const classes = ['btn', kind === 'primary' ? '' : kind, small ? 'small' : '']
     .filter(Boolean).join(' ');
-  return el('button', { class: classes, type, ...(onclick ? { onclick } : {}) }, text);
+  return el('button', {
+    class: classes, type, ...(ariaLabel ? { 'aria-label': ariaLabel } : {}),
+    ...(onclick ? { onclick } : {}),
+  }, text);
 }
 
 /** Read a form into a plain object. Checkboxes become booleans. */
@@ -170,7 +175,7 @@ export function table(headers, rows, { emptyMessage } = {}) {
   if (!rows || rows.length === 0) return empty(emptyMessage);
   return el('div', { class: 'scroll-x' },
     el('table', {},
-      el('thead', {}, el('tr', {}, headers.map((h) => el('th', {}, h)))),
+      el('thead', {}, el('tr', {}, headers.map((h) => el('th', { scope: 'col' }, h)))),
       el('tbody', {}, rows.map((cells) => el('tr', {}, cells.map((c) => el('td', {}, c)))))));
 }
 

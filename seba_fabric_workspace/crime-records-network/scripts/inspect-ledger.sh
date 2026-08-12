@@ -188,10 +188,10 @@ if [ -n "${RECORD}" ]; then
   setUser police insp.sharma
   peer chaincode query -C "${CHANNEL}" -n "${CC}" \
     -c "{\"function\":\"RecordContract:GetRecord\",\"Args\":[\"${RECORD}\"]}" 2>/dev/null \
-    | jq '{recordId, recordType, sensitivityLevel, jurisdiction, payloadHash, offchainUri}' \
+    | jq '{recordId, recordType, sensitivityLevel, jurisdiction, contentHash, offChainReference}' \
     | sed 's/^/  /'
   echo
-  note "payloadHash is the commitment; offchainUri points to where the real file lives."
+  note "contentHash is the commitment; offChainReference identifies the agency vault object."
 fi
 hold
 

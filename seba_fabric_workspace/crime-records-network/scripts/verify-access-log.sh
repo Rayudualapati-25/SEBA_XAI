@@ -1,15 +1,11 @@
 #!/usr/bin/env bash
 #
-# Verify the access log has not been edited or truncated.
-#
-# Recomputes the whole hash chain from the first entry, then compares it against
-# every anchor the blockchain holds. Prints the first divergent entry if any.
+# Read the direct-ledger access events and describe Fabric's integrity controls.
 #
 # Usage: ./scripts/verify-access-log.sh
 
 set -uo pipefail
 
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 API="${API_BASE:-http://localhost:3001/api}"
 
 info() { printf '\n\033[0;34m==> %s\033[0m\n' "$1"; }
@@ -21,33 +17,22 @@ curl -s --max-time 3 "${API}/health" >/dev/null 2>&1 \
 info "Signing in as the auditor"
 TOKEN="$(curl -s -X POST "${API}/auth/login" \
   -H 'Content-Type: application/json' \
-  -d '{"username":"aud.qureshi","password":"demo123"}' \
+  -d '{"username":"aud.qureshi"}' \
   | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{
       const j=JSON.parse(d); if(!j.success){console.error(j.error);process.exit(1);}
       console.log(j.data.token);})')" || die "login failed"
 
-info "Anchoring anything not yet committed to the blockchain"
-curl -s -X POST "${API}/audit/anchor" -H "Authorization: Bearer ${TOKEN}" \
-  | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{
-      const r=JSON.parse(d).data;
-      console.log(r.anchored
-        ? `  anchored up to entry ${r.anchor.seqNo} (tx ${r.anchor.txId.slice(0,16)}…)`
-        : `  ${r.reason}`);})'
-
-info "Recomputing the hash chain and comparing with on-chain anchors"
+info "Reading ledger events and Fabric integrity description"
 curl -s "${API}/audit/access-log/verify" -H "Authorization: Bearer ${TOKEN}" \
   | node -e 'let d="";process.stdin.on("data",c=>d+=c).on("end",()=>{
-      const r = JSON.parse(d).data;
-      console.log(`  log epoch         : ${r.epoch}`);
-      console.log(`  entries re-hashed : ${r.entriesChecked}`);
-      console.log(`  anchors compared  : ${r.anchorsChecked}`);
-      if (r.anchorError) console.log(`  WARNING: ledger unreadable (${r.anchorError}) — local chain only`);
-      if (r.priorEpochWarning) console.log(`  NOTE: ${r.priorEpochWarning}`);
+      const j=JSON.parse(d); if(!j.success){console.error(j.error);process.exit(1);}
+      const r=j.data;
+      console.log(`  events returned : ${r.entriesChecked}`);
+      console.log(`  storage         : ${r.storage}`);
+      console.log(`  mechanism       : ${r.mechanism}`);
       if (r.ok) {
-        console.log("\n  \x1b[0;32mLOG INTACT\x1b[0m — every entry matches its hash and its anchor.");
+        console.log("\n  \x1b[0;32mLEDGER READ SUCCEEDED\x1b[0m — events are Fabric transactions.");
         process.exit(0);
       }
-      console.log(`\n  \x1b[0;31mLOG TAMPERED\x1b[0m — first bad entry: #${r.firstBadSeq}`);
-      for (const p of r.problems.slice(0, 10)) console.log(`    - ${p}`);
       process.exit(1);
     })'

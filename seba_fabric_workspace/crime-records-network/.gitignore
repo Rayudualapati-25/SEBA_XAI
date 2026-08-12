@@ -13,6 +13,7 @@ coverage/
 
 # Wallets and local state (never commit identities)
 backend/wallets/
+backend/data/agency-vault/
 *.sqlite
 *.db
 

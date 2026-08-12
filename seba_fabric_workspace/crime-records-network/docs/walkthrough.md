@@ -1,142 +1,57 @@
-# Demonstration procedure
+# Demonstration walkthrough
 
-A sequence for showing the implementation working, in about ten minutes. Each
-part states what is being demonstrated and what output confirms it.
-
-## Preparation
+## Start
 
 ```bash
-make clean-containers      # stale build containers slow Docker down
-docker ps | wc -l          # expect 22 containers; if none, see below
-make ollama                # local model for explanation wording
-make backend               # leave running
+make down
+make all
+make backend
 ```
 
-If the network is not up:
+Open `http://localhost:3001`. Select an enrolled Fabric identity; there is no
+application password. The screen explicitly labels this as a custodial local
+development identity selector.
 
-```bash
-make up && make deploy && make seed     # about 3 minutes
-```
+## Eight scenarios
 
-Open `http://localhost:3001`. All seeded accounts use the password `demo123`.
-
----
-
-## Part 1 — Ledger state
-
-```bash
-make inspect
-```
-
-Nine sections, pausing between each. What each one establishes:
-
-| Section | Establishes |
-|---|---|
-| 1. Containers | Five department peers, six certificate authorities, one ordering service |
-| 2. Block height | All five peers report the same height and the same latest block hash |
-| 3. Decoded block | Block number, previous-block hash, transaction count — the chain structure itself |
-| 4. Endorsements | Three organisations signed the transaction; majority-of-five policy in effect |
-| 5. Chaincode containers | Policy rules execute on the peers, not in the application |
-| 6. Certificate attributes | Role, clearance, jurisdiction and case assignments are inside the officer's X.509 certificate |
-| 7. Key history | Past record versions with the transaction that wrote each |
-| 8. On-chain record | Metadata, `payloadHash`, `offchainUri` — no case narrative |
-| 9. World state | CouchDB per department, browsable in a browser |
-
-Sections 4 and 6 are the two properties a two-peer test network cannot show:
-multi-organisation consensus, and access decided from cryptographic identity
-rather than from an editable database row.
-
----
-
-## Part 2 — Access governance
-
-In the web interface, in this order:
-
-| Sign in as | Action | Observed |
+| Identity | Action | Expected evidence |
 |---|---|---|
-| `const.verma` | File a record | Narrative to agency storage, hash to the ledger |
-| `const.verma` | Search `CASE-2026-001`, request access to a result | **Escalate** — clearance `low` against a `medium` record, with the structured explanation and the model's wording |
-| `dc.nair` | Same search, request access | **Deny** for a different reason: no permission for that role on that record type |
-| `judge.rana` | Escalation queue, approve | The escalation clears; the approval is itself a ledger transaction |
-| `aud.qureshi` | Audit trail, then Verify payload integrity | Every decision with its explanation; integrity confirmed |
-| `aud.qureshi` | Access log, then Verify log integrity | Searches and file releases, with the number of on-chain anchors compared |
+| `io.krishnan` | request `REC-FIR-001` for investigation | `ALLOW / POLICY_SATISFIED` |
+| `const.verma` | same request without assignment | `DENY / NOT_ASSIGNED` |
+| `analyst.rao` | request victim-protected `REC-EVIDENCE-001` | `DENY / VICTIM_DATA_NOT_NECESSARY` |
+| `insp.singh` | cross-district request | `ESCALATE / CROSS_JURISDICTION` |
+| `insp.sharma` | request `REC-JUVENILE-001` | `DENY / JUVENILE_PROTECTED` |
+| `judge.rana` | approve the cross-district escalation | linked Approval and payload release |
+| `insp.rathore` | request with revoked certificate attribute | `DENY / CRED_NOT_ACTIVE` |
+| `aud.qureshi` | inspect audit trail, then request raw content | full metadata reconstruction; raw content denied |
 
-The constable's escalate result is the most compact demonstration: access control,
-ledger commitment and generated explanation in a single view.
+Each decision page should show its reason, decisive attributes, policy version,
+counterfactual, decision hash, and Fabric transaction ID.
 
-Note that the same constable may *file* a record but is *escalated* when reading
-one. Filing and reading are governed separately.
+## Automated proof
 
----
-
-## Part 3 — Tamper detection
-
-Confirm the log verifies:
+Leave the backend running in one terminal, then:
 
 ```bash
-make verify-log
+make test-chaincode   # 92 deterministic chaincode tests
+make test-backend     # 33 live API + explanation tests
+make smoke            # 16 live end-to-end checks
+make verify-log       # reads direct Fabric audit events
+make measure          # role-only ablation versus contextual policy
+make inspect          # interactive ledger/block/certificate inspection
 ```
 
-Reports `LOG INTACT`. Now modify the database directly, bypassing the
-application:
+`make verify-log` does not reconcile an external database. Authenticated access
+events are Fabric transactions, so it reports the ledger mechanisms: endorsement,
+ordering, block hashes, and key history.
 
-```bash
-sqlite3 backend/data/offchain.sqlite "UPDATE access_log SET action='auth.whoami' WHERE seq=2;"
-make verify-log
-```
+## What to tell a reviewer
 
-Reports `LOG TAMPERED` and the first divergent entry. Restoring the original
-value makes it pass again, which shows the check is specific rather than simply
-alarming.
-
-The same applies to record payloads: edit a row in `payloads` and the auditor's
-payload integrity check fails against the on-chain commitment.
-
----
-
-## Part 4 — Verification and measurement
-
-```bash
-make test          # 70 chaincode tests, 48 backend tests
-make smoke         # 11-step scenario on the live network
-```
-
-Generated results, best viewed rendered (`Cmd+Shift+V` in VS Code):
-
-- `experiments/results/live_fabric_measurements.md`
-- `experiments/results/explanation_quality.md`
-
-Two points to state rather than leave to be discovered:
-
-**Build latency.** The end-to-end figure is 2072 ms, of which 2000 ms is the
-orderer's configured `BatchTimeout`. The comparable quantity against the paper's
-simulated 11.10 ms is the marginal cost of about 73 ms. Quoting the end-to-end
-figure as the cost of the audit design would be incorrect.
-
-**Explanation quality.** The deterministic template scores higher than the model
-(1.00 against 0.92 coverage), and the validator rejected half the model's
-generations. The metric credits an explanation for naming the decisive
-attributes, which a template does on every input; the reference implementation
-describes it as a weak textual proxy. The result is expected and is reported as
-such.
-
----
-
-## Code worth opening
-
-| File | Contents |
-|---|---|
-| `chaincode/crimerecords/lib/policy/policyEngine.js` | The eight access rules, in evaluation order |
-| `chaincode/crimerecords/lib/accessContract.js` | Request assembly, policy call, explanation commitment |
-| `chaincode/crimerecords/lib/util/identity.js` | Reading attributes from the signed certificate |
-| `backend/src/audit/accessLog.js` | The hash chain and its verification |
-| `network/configtx/configtx.yaml` | Organisations and the endorsement policy |
-
-## Troubleshooting
-
-| Symptom | Cause and action |
-|---|---|
-| No containers listed | Docker or Colima not running. Start Colima, then `make up` |
-| Tests unusually slow | Stale chaincode build containers. `make clean-containers` |
-| Explanations say "template wording" | Ollama not running. `make ollama`. The interface still functions |
-| "Session expired" in the browser | Backend restarted. Sign in again |
+- The project did not put all data on-chain. That would replicate sensitive
+  victim and juvenile data to every peer and make deletion difficult.
+- It put governance state, integrity commitments, approvals, and audit evidence
+  on-chain; raw content stays under agency control.
+- The 2-second transaction times in the current local run are dominated by the
+  configured orderer batch timeout and are not a distributed performance claim.
+- The policy and data are synthetic. The prototype does not establish legal
+  compliance, production security, or CCTNS/ICJS integration.

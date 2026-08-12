@@ -17,7 +17,7 @@
  * value of that attribute.
  *
  * Usage:
- *   ENABLE_EXPERIMENTS=1 npm start        (in backend/, first)
+ *   npm start                             (in backend/, first)
  *   node experiments/evaluate-explanations.js
  */
 
@@ -118,7 +118,7 @@ async function api(method, urlPath, { token, body } = {}) {
 }
 
 async function login(username) {
-  const { data, error } = await api('POST', '/auth/login', { body: { username, password: 'demo123' } });
+  const { data, error } = await api('POST', '/auth/login', { body: { username } });
   if (!data) throw new Error(`login ${username}: ${error}`);
   return data.token;
 }
@@ -159,7 +159,7 @@ async function collectDecisions(runId) {
     { label: 'escalate / low clearance', user: 'const.verma', recordId: plain, purpose: 'investigation' },
     { label: 'deny / role has no permission', user: 'dc.nair', recordId: plain, purpose: 'defense-preparation' },
     { label: 'deny / revoked credential', user: 'insp.rathore', recordId: plain, purpose: 'investigation' },
-    { label: 'escalate / juvenile record', user: 'const.verma', recordId: juvenile, purpose: 'investigation' },
+    { label: 'deny / juvenile record', user: 'const.verma', recordId: juvenile, purpose: 'investigation' },
     { label: 'escalate / sealed record', user: 'pp.mehta', recordId: sealed, purpose: 'prosecution' },
   ];
 

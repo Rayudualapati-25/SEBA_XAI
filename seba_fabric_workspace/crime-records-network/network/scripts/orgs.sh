@@ -3,6 +3,20 @@
 # Shared org metadata + peer CLI environment helpers.
 # Source this from scripts that run with PWD = crime-records-network/network.
 
+# The Fabric binaries live in the parent workspace, not on the system PATH.
+# network-up.sh exports the PATH before calling its children, but `make deploy`
+# and `make seed` invoke scripts here directly and make starts a fresh shell for
+# every recipe line, so that export never reaches them. Every script in this
+# directory sources this file, so resolving the PATH here covers all of them.
+# Derived from this file's own location rather than PWD, so it holds however the
+# caller was invoked.
+_ORGS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+_FABRIC_BIN="$(cd "${_ORGS_DIR}/../../.." && pwd)/fabric-samples/bin"
+if [ -d "${_FABRIC_BIN}" ] && [[ ":${PATH}:" != *":${_FABRIC_BIN}:"* ]]; then
+  export PATH="${_FABRIC_BIN}:${PATH}"
+fi
+unset _ORGS_DIR _FABRIC_BIN
+
 # org : msp id : CA port : peer port
 ORGS=(
   "police:PoliceMSP:7054:7051"

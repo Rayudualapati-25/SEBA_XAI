@@ -86,12 +86,37 @@ const query = (params) => {
 
 export const api = {
   auth: {
-    async login(username, password) {
-      const data = await request('POST', '/auth/login', { username, password });
+    async login(username) {
+      const data = await request('POST', '/auth/login', { username });
       session.save(data.token, data.user);
       return data.user;
     },
     me: () => request('GET', '/auth/me'),
+  },
+
+  // Accounts live on the ledger, not in a database. `register` performs both
+  // halves in one call: a Fabric CA enrolment, then a CreateUser transaction.
+  users: {
+    list: () => request('GET', '/users'),
+    get: (username) => request('GET', `/users/${username}`),
+    history: (username) => request('GET', `/users/${username}/history`),
+    register: (body) => request('POST', '/users', body),
+    setStatus: (username, status) =>
+      request('POST', `/users/${username}/status`, { status }),
+  },
+
+  departments: {
+    list: () => request('GET', '/departments'),
+    create: (body) => request('POST', '/departments', body),
+  },
+
+  cases: {
+    list: () => request('GET', '/cases'),
+    get: (caseId) => request('GET', `/cases/${caseId}`),
+    create: (body) => request('POST', '/cases', body),
+    assign: (caseId, userId) => request('POST', `/cases/${caseId}/assign`, { userId }),
+    workflow: (caseId) => request('GET', `/cases/${caseId}/workflow`),
+    advance: (caseId, body) => request('POST', `/cases/${caseId}/workflow`, body),
   },
 
   records: {
@@ -108,6 +133,10 @@ export const api = {
     attach: (recordId, body) => request('POST', `/records/${recordId}/evidence`, body),
     detail: (recordId, evidenceId) =>
       request('GET', `/records/${recordId}/evidence/${evidenceId}/detail`),
+    custody: (recordId, evidenceId) =>
+      request('GET', `/records/${recordId}/evidence/${evidenceId}/custody`),
+    transfer: (recordId, evidenceId, body) =>
+      request('POST', `/records/${recordId}/evidence/${evidenceId}/custody`, body),
   },
 
   access: {
@@ -127,7 +156,6 @@ export const api = {
       request('POST', `/audit/verify-explanation/${recordId}/${decisionId}`, { artifact }),
     accessLog: (limit = 50) => request('GET', `/audit/access-log${query({ limit })}`),
     verifyAccessLog: () => request('GET', '/audit/access-log/verify'),
-    anchor: () => request('POST', '/audit/anchor'),
   },
 
   explain: {

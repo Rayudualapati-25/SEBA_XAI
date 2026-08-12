@@ -29,6 +29,7 @@ const ATTRIBUTE_NAMES = Object.freeze([
  */
 function getCaller(ctx) {
   const cid = ctx.clientIdentity;
+  const id = cid.getID();
   const attrs = {};
   for (const name of ATTRIBUTE_NAMES) {
     const value = cid.getAttributeValue(name);
@@ -38,9 +39,21 @@ function getCaller(ctx) {
   }
   return Object.freeze({
     mspId: cid.getMSPID(),
-    id: cid.getID(),
+    id,
+    enrollmentId: enrollmentIdFromX509Id(id),
     ...attrs,
   });
+}
+
+/**
+ * Fabric ClientIdentity#getID returns `x509::<subject>::<issuer>`. Depending
+ * on the SDK/OpenSSL version, the subject DN is slash- or comma-delimited.
+ * Parse only the subject section and accept both canonical encodings.
+ */
+function enrollmentIdFromX509Id(id) {
+  const subject = String(id || '').split('::')[1] || '';
+  const match = subject.match(/(?:^|[\/,])CN=([^\/,]+)/);
+  return match ? match[1] : null;
 }
 
 /** Throw unless the caller belongs to one of the given MSPs. */
@@ -63,4 +76,6 @@ function requireRole(caller, allowedRoles, action) {
   }
 }
 
-module.exports = { MSP, getCaller, requireMsp, requireRole, ATTRIBUTE_NAMES };
+module.exports = {
+  MSP, getCaller, requireMsp, requireRole, enrollmentIdFromX509Id, ATTRIBUTE_NAMES,
+};

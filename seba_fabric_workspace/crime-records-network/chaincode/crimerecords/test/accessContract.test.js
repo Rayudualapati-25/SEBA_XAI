@@ -6,7 +6,8 @@ chai.use(require('chai-as-promised'));
 
 const RecordContract = require('../lib/recordContract');
 const AccessContract = require('../lib/accessContract');
-const { buildMockContext, cloneInto, CALLERS, RECORD_META } = require('./testHelpers');
+const { sha256 } = require('../lib/util/validate');
+const { buildMockContext, cloneInto, seedCase, CALLERS, RECORD_META } = require('./testHelpers');
 
 const records = new RecordContract();
 const access = new AccessContract();
@@ -15,6 +16,27 @@ const access = new AccessContract();
 // context whose identity is `caller`.
 async function worldAs(caller, txId = 'TX-REQ') {
   const policeCtx = buildMockContext(CALLERS.inspector);
+  const identityId = caller.identityId || 'test-user';
+  const assignments = String(caller.attrs?.caseAssignments || '').split(/[,|]/);
+  await seedCase(policeCtx, 'CASE-1', {
+    assignedUsers: assignments.includes('CASE-1') ? [identityId] : [],
+  });
+  const org = caller.mspId === 'PoliceMSP' ? 'police'
+    : caller.mspId === 'ForensicsMSP' ? 'forensics'
+      : caller.mspId === 'ProsecutionMSP' ? 'prosecution'
+        : caller.mspId === 'CourtMSP' ? 'court' : 'audit';
+  await policeCtx.stub.putState(
+    policeCtx.stub.createCompositeKey('user', [identityId]),
+    Buffer.from(JSON.stringify({
+      docType: 'user', userId: identityId, fabricUser: identityId, org,
+      role: caller.attrs?.role,
+      rank: caller.attrs?.rank,
+      station: caller.attrs?.station,
+      jurisdiction: caller.attrs?.jurisdiction,
+      clearance: caller.attrs?.clearance,
+      credentialStatus: 'active',
+    }))
+  );
   await records.CreateCaseRecord(policeCtx, 'FIR-1', JSON.stringify(RECORD_META));
   const ctx = buildMockContext({ ...caller, txId });
   cloneInto(policeCtx, ctx);
@@ -36,10 +58,11 @@ describe('AccessContract', () => {
       expect(ctx._events[0].name).to.equal('AccessDecision');
     });
 
-    it('minimizes the stored subject: no badgeId, no cert identity', async () => {
+    it('minimizes the stored subject and binds it to an identity hash', async () => {
       const ctx = await worldAs(CALLERS.inspector);
       const event = JSON.parse(await access.RequestAccess(ctx, 'FIR-1', 'view', ENV));
       expect(event.subject).to.deep.equal({
+        identityHash: sha256(ctx.clientIdentity.getID()),
         mspId: 'PoliceMSP', role: 'inspector', station: 'PS-Central',
         jurisdiction: 'district-north', clearance: 'high',
       });
@@ -82,6 +105,37 @@ describe('AccessContract', () => {
       expect(event.status).to.equal('pending-escalation');
       expect(event.explanation.reasonCode).to.equal('INSUFFICIENT_CLEARANCE');
       expect(event.explanation.counterfactual).to.contain('clearance');
+    });
+
+    it('uses ledger UserProfile status even when the certificate still says active', async () => {
+      const ctx = await worldAs(CALLERS.inspector);
+      const key = ctx.stub.createCompositeKey('user', [CALLERS.inspector.identityId]);
+      const profile = JSON.parse((await ctx.stub.getState(key)).toString());
+      await ctx.stub.putState(key, Buffer.from(JSON.stringify({
+        ...profile, credentialStatus: 'suspended',
+      })));
+      const event = JSON.parse(await access.RequestAccess(ctx, 'FIR-1', 'view', ENV));
+      expect(event.decision).to.equal('deny');
+      expect(event.explanation.reasonCode).to.equal('CRED_NOT_ACTIVE');
+    });
+
+    it('uses the current Case assignment instead of a stale certificate assignment', async () => {
+      const ctx = await worldAs(CALLERS.inspector);
+      const key = ctx.stub.createCompositeKey('case', ['CASE-1']);
+      const caseAsset = JSON.parse((await ctx.stub.getState(key)).toString());
+      await ctx.stub.putState(key, Buffer.from(JSON.stringify({
+        ...caseAsset, assignedUsers: [],
+      })));
+      const event = JSON.parse(await access.RequestAccess(ctx, 'FIR-1', 'view', ENV));
+      expect(event.decision).to.equal('deny');
+      expect(event.explanation.reasonCode).to.equal('NOT_ASSIGNED');
+    });
+
+    it('rejects a certificate that has no matching ledger UserProfile', async () => {
+      const ctx = await worldAs(CALLERS.inspector);
+      ctx._state.delete(ctx.stub.createCompositeKey('user', [CALLERS.inspector.identityId]));
+      await expect(access.RequestAccess(ctx, 'FIR-1', 'view', ENV))
+        .to.be.rejectedWith(/no UserProfile/);
     });
 
     it('rejects unknown env fields, bad actions, roleless callers, missing records', async () => {

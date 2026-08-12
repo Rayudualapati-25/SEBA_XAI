@@ -53,6 +53,7 @@ export default {
           checkbox('juvenileFlag', 'Juvenile involved'),
           checkbox('witnessFlag', 'Witness information'),
         ),
+        checkbox('victimProtectionFlag', 'Victim identity/address protected'),
       ],
       onSubmit: async (values, formNode) => {
         const record = await api.records.create({
@@ -69,13 +70,14 @@ export default {
             sensitivityLevel: values.sensitivityLevel,
             juvenileFlag: values.juvenileFlag,
             witnessFlag: values.witnessFlag,
+            victimProtectionFlag: values.victimProtectionFlag,
             owningStation: values.owningStation.trim(),
             jurisdiction: values.jurisdiction.trim(),
           },
         });
         replace(output, callout('good', 'Record committed to the ledger',
           hint('Record ', mono(record.recordId),
-            ' · payload hash ', mono(shortHash(record.payloadHash)),
+            ' · content hash ', mono(shortHash(record.contentHash)),
             ' · transaction ', mono(shortHash(record.createdTxId)))));
         formNode.reset();
       },

@@ -10,13 +10,28 @@
  */
 
 const { Contract } = require('fabric-contract-api');
-const { getCaller, requireRole } = require('./util/identity');
+const { MSP, getCaller, requireRole } = require('./util/identity');
 const { validateAllowList, hashObject, sha256, SAFE_ID } = require('./util/validate');
 const { evaluate } = require('./policy/policyEngine');
-const { ACTIONS, ESCALATION_APPROVERS, PURPOSES } = require('./policy/policyV1');
+const {
+  ACTIONS, ESCALATION_APPROVERS, PURPOSES, POLICY_VERSION,
+} = require('./policy/policyV1');
 
-const ACCESS_KEY = 'access';
+const REQUEST_KEY = 'accessRequest';
+const ACCESS_KEY = 'accessDecision';
+const APPROVAL_KEY = 'approval';
 const RECORD_KEY = 'record';
+const USER_KEY = 'user';
+const CASE_KEY = 'case';
+const ACTIVE_POLICY_KEY = 'activePolicyVersion';
+
+const ORG_TO_MSP = Object.freeze({
+  police: MSP.POLICE,
+  forensics: MSP.FORENSICS,
+  prosecution: MSP.PROSECUTION,
+  court: MSP.COURT,
+  audit: MSP.AUDIT,
+});
 
 const ENV_SCHEMA = {
   purpose: { type: 'string', required: true, enum: [...PURPOSES] },
@@ -52,6 +67,56 @@ class AccessContract extends Contract {
   }
 
   /**
+   * Bind the certificate to its active UserProfile, then derive assignment
+   * from the current Case asset. Certificate attributes remain the
+   * cryptographic identity source; Fabric state supplies revocation and
+   * mutable governance facts that must take effect without reissuing a cert.
+   */
+  async _governedSubject(ctx, caller, record) {
+    if (!caller.enrollmentId) {
+      throw new Error('unauthorized: caller certificate has no enrollment identity');
+    }
+    const userData = await ctx.stub.getState(
+      ctx.stub.createCompositeKey(USER_KEY, [caller.enrollmentId])
+    );
+    if (!userData || userData.length === 0) {
+      throw new Error('unauthorized: caller has no UserProfile on the ledger');
+    }
+    const user = JSON.parse(userData.toString());
+    if (user.fabricUser !== caller.enrollmentId
+        || ORG_TO_MSP[user.org] !== caller.mspId
+        || user.role !== caller.role) {
+      throw new Error('unauthorized: certificate does not match the UserProfile');
+    }
+    for (const attribute of ['rank', 'station', 'jurisdiction', 'clearance']) {
+      if (user[attribute] && caller[attribute] !== user[attribute]) {
+        throw new Error(`unauthorized: certificate ${attribute} does not match UserProfile`);
+      }
+    }
+
+    const caseData = await ctx.stub.getState(
+      ctx.stub.createCompositeKey(CASE_KEY, [record.caseId])
+    );
+    if (!caseData || caseData.length === 0) {
+      throw new Error(`case '${record.caseId}' does not exist`);
+    }
+    const caseAsset = JSON.parse(caseData.toString());
+    const assigned = Array.isArray(caseAsset.assignedUsers)
+      && caseAsset.assignedUsers.includes(caller.enrollmentId);
+    const credentialStatus = user.credentialStatus !== 'active'
+      ? user.credentialStatus
+      : caller.credentialStatus !== 'active'
+        ? caller.credentialStatus || 'inactive'
+        : 'active';
+
+    return Object.freeze({
+      ...caller,
+      credentialStatus,
+      caseAssignments: assigned ? record.caseId : null,
+    });
+  }
+
+  /**
    * Request access to a record. Returns the stored decision event, including
    * the explanation artifact ("why was this allowed/denied/escalated?").
    */
@@ -73,7 +138,17 @@ class AccessContract extends Contract {
     const record = JSON.parse(recordData.toString());
 
     const env = validateAllowList(JSON.parse(envJson), ENV_SCHEMA, 'environment');
-    const outcome = evaluate(caller, record, action, env);
+    const activePolicyData = await ctx.stub.getState(ACTIVE_POLICY_KEY);
+    if (activePolicyData && activePolicyData.length > 0) {
+      const activePolicy = JSON.parse(activePolicyData.toString());
+      if (activePolicy.version !== POLICY_VERSION) {
+        throw new Error(
+          `active policy '${activePolicy.version}' does not match deployed policy code`
+        );
+      }
+    }
+    const subject = await this._governedSubject(ctx, caller, record);
+    const outcome = evaluate(subject, record, action, env);
 
     const explanation = {
       decision: outcome.decision,
@@ -84,9 +159,29 @@ class AccessContract extends Contract {
     };
 
     const decisionId = ctx.stub.getTxID();
-    const event = {
+    const request = {
+      docType: 'accessRequest',
+      requestId: decisionId,
+      recordId,
+      requesterIdentityHash: sha256(subject.id),
+      requesterMsp: subject.mspId,
+      requesterRole: subject.role,
+      action,
+      purpose: env.purpose,
+      context: {
+        timeWindow: env.timeWindow,
+        emergencyFlag: env.emergencyFlag,
+        courtLink: env.courtLink,
+        approvalTokenHash: env.approvalToken ? sha256(env.approvalToken) : null,
+      },
+      status: outcome.decision === 'escalate' ? STATUS.PENDING : 'decided',
+      submittedAtUtc: ctx.stub.getDateTimestamp().toISOString(),
+      txId: decisionId,
+    };
+    const eventBase = {
       docType: 'accessDecision',
       decisionId,
+      requestId: request.requestId,
       recordId,
       caseId: record.caseId,
       action,
@@ -94,13 +189,15 @@ class AccessContract extends Contract {
       status: outcome.decision === 'allow' ? STATUS.GRANTED
         : outcome.decision === 'deny' ? STATUS.DENIED
           : STATUS.PENDING,
-      // Subject snapshot is minimized: role/context only, no personal fields.
+      // The one-way identity commitment binds a grant to the exact certificate
+      // without placing its distinguished name in the decision record.
       subject: {
-        mspId: caller.mspId,
-        role: caller.role,
-        station: caller.station,
-        jurisdiction: caller.jurisdiction,
-        clearance: caller.clearance,
+        identityHash: sha256(subject.id),
+        mspId: subject.mspId,
+        role: subject.role,
+        station: subject.station,
+        jurisdiction: subject.jurisdiction,
+        clearance: subject.clearance,
       },
       environment: {
         purpose: env.purpose,
@@ -115,7 +212,12 @@ class AccessContract extends Contract {
       policyVersion: outcome.policyVersion,
       createdAtUtc: ctx.stub.getDateTimestamp().toISOString(),
     };
+    const event = { ...eventBase, decisionHash: hashObject(eventBase) };
 
+    await ctx.stub.putState(
+      ctx.stub.createCompositeKey(REQUEST_KEY, [request.requestId]),
+      Buffer.from(JSON.stringify(request))
+    );
     await ctx.stub.putState(
       this._decisionKey(ctx, recordId, decisionId),
       Buffer.from(JSON.stringify(event))
@@ -161,10 +263,38 @@ class AccessContract extends Contract {
         resolutionTxId: ctx.stub.getTxID(),
       },
     };
+    const approval = {
+      docType: 'approval',
+      approvalId: ctx.stub.getTxID(),
+      requestId: event.requestId,
+      decisionId,
+      recordId,
+      outcome: approve ? 'approved' : 'rejected',
+      supervisorIdentityHash: sha256(caller.id),
+      supervisorMsp: caller.mspId,
+      supervisorRole: caller.role,
+      reason: typeof note === 'string' && note.length > 0 ? note.slice(0, 500) : null,
+      timestamp: ctx.stub.getDateTimestamp().toISOString(),
+      status: 'active',
+    };
     await ctx.stub.putState(
       this._decisionKey(ctx, recordId, decisionId),
       Buffer.from(JSON.stringify(resolved))
     );
+    await ctx.stub.putState(
+      ctx.stub.createCompositeKey(APPROVAL_KEY, [event.requestId, approval.approvalId]),
+      Buffer.from(JSON.stringify(approval))
+    );
+    const requestKey = ctx.stub.createCompositeKey(REQUEST_KEY, [event.requestId]);
+    const requestData = await ctx.stub.getState(requestKey);
+    if (requestData && requestData.length > 0) {
+      const request = JSON.parse(requestData.toString());
+      await ctx.stub.putState(requestKey, Buffer.from(JSON.stringify({
+        ...request,
+        status: approve ? STATUS.APPROVED : STATUS.REJECTED,
+        resolvedByApproval: approval.approvalId,
+      })));
+    }
     ctx.stub.setEvent('EscalationResolved', Buffer.from(JSON.stringify({
       decisionId, recordId, approved: approve,
     })));
@@ -173,6 +303,28 @@ class AccessContract extends Contract {
 
   async GetDecision(ctx, recordId, decisionId) {
     return JSON.stringify(await this._getDecision(ctx, recordId, decisionId));
+  }
+
+  async GetRequest(ctx, requestId) {
+    const data = await ctx.stub.getState(
+      ctx.stub.createCompositeKey(REQUEST_KEY, [requestId])
+    );
+    if (!data || data.length === 0) {
+      throw new Error(`access request '${requestId}' does not exist`);
+    }
+    return data.toString();
+  }
+
+  async QueryApprovalsByRequest(ctx, requestId) {
+    const iterator = await ctx.stub.getStateByPartialCompositeKey(APPROVAL_KEY, [requestId]);
+    const items = [];
+    let res = await iterator.next();
+    while (!res.done) {
+      items.push(JSON.parse(res.value.value.toString()));
+      res = await iterator.next();
+    }
+    await iterator.close();
+    return JSON.stringify(items);
   }
 
   async QueryDecisionsByRecord(ctx, recordId) {

@@ -1,0 +1,191 @@
+%% Section I -- Introduction.
+%% FROZEN BY AUTHOR: the text of this section is carried over verbatim from
+%% 30th_July_SEBA_XAI.pdf. Only two mechanical changes were made for acmart:
+%%   (1) \IEEEPARstart{C}{onsider} -> "Consider" (no IEEE drop cap in acmart);
+%%   (2) \subsection headings retained; itemize retained.
+%% Do not reword without the author's approval.
+
+\section{Introduction}
+\label{sec:intro}
+
+Consider an armed robbery registered at a town police station. Three men rob a
+jewellery shop at closing time, an employee is injured, and one robber leaves
+blood on a display counter. Within two weeks the case file contains the first
+information report, the complainant and witness statements, a medico-legal
+certificate, the investigating officer's case diary, seizure memos, CCTV
+footage, forensic exhibits, and the call records of a stolen phone. During
+investigation, one of the accused is found to be seventeen years old, so his
+identity and records fall under statutory juvenile protection. From this point,
+requests for the file arrive from several directions, and each one needs a
+different answer.
+
+The sub-inspector assigned as investigating officer needs the full file and
+should receive it. A constable from the same station, with no connection to the
+case, asks for the case diary and should be refused, although his station and
+his role are the same as his colleague's. A sub-inspector from a neighbouring
+district, investigating a similar gang robbery, requests the CCTV stills to
+compare the method of operation; his purpose is legitimate, but the request
+crosses a district boundary, so it should be neither silently granted nor
+silently refused. It should go to a supervisory officer, and the approval itself
+should be recorded. A forensic scientist analysing the blood sample needs the
+exhibit-chain records and should get them, but when the same scientist requests
+the victim's name and address a few minutes later, the answer must be no,
+because nothing in a forensic examination requires it. The superintendent of
+police, despite outranking everyone above, must be refused the juvenile's
+identity, because a statutory protection class is stronger than rank. Finally,
+six months later, an inquiry authority who was present for none of these events
+must be able to verify what was released, to whom, on what grounds, and who
+approved it.
+
+This scenario is the subject of the paper, and it shows three things that any
+access mechanism for such workflows must provide. First, the decision cannot be
+derived from the job role alone: the constable and the investigating officer
+hold comparable roles and receive opposite answers, and the forensic scientist
+receives opposite answers to two of his own requests made minutes apart. The
+decision depends on attributes of the requester, the record, the requested
+action, the stated purpose, and the operating context. Second, allow and deny
+are not enough: some requests are legitimate but cross a boundary that requires
+a human authority, so \emph{escalate} must be a first-class outcome and the
+resulting approval must become part of the evidence. Third, decision evidence
+must outlive the decision: whatever the inquiry authority needs in month six
+must have been recorded in month one, because it cannot be reconstructed
+afterwards. The risk of weak governance here is not hypothetical. In 2023, a
+data breach at the Police Service of Northern Ireland exposed the names, ranks,
+and locations of serving officers, and the UK Information Commissioner's Office
+later imposed a fine over the
+incident~\cite{guardian_psni_breach_2023,ico_psni_fine_2024}.
+
+The infrastructure to move such records between agencies already exists. In
+India, the Crime and Criminal Tracking Network and Systems (CCTNS) connects
+police stations nationwide, and the Inter-Operable Criminal Justice System
+(ICJS) links the police pillar with courts, prisons, forensic laboratories, and
+prosecution~\cite{pib_cctns_2026,mha_icjs_2026}. This paper does not propose a
+replacement for these systems. It addresses what they leave open: once a record
+is technically reachable across an agency boundary, the decision to release it
+must be made from context, recorded with its grounds, and protected against
+later manipulation.
+
+Existing work covers parts of this requirement, and each part stops short at a
+known point. Role-based access control assigns permissions to job
+titles~\cite{sandhu_rbac_1996}, but the scenario above defeats it in its first
+two requests. Attribute-based access control decides from subject, object,
+action, and environment attributes~\cite{nist_abac_2014}, and recent work
+extends it toward accountability~\cite{hu_accountable_private_ac_2024} and
+privacy preservation~\cite{kerl_privacy_abac_2025}; policy engines of this kind,
+however, are built to produce decisions, not to preserve reviewable evidence of
+how each decision was reached. Blockchain-based audit preserves evidence in a
+tamper-evident, multi-party
+form~\cite{nist_blockchain_access_2022,androulaki_fabric_2018} and has been
+applied to digital evidence
+protection~\cite{banerjee_dashdikpala_2026,anbarasi_ai_criminal_justice_2026},
+but it certifies only that a stored entry has not been altered after it was
+written. Explainable AI produces reasons for decisions, and the argument that
+high-stakes systems should prefer reviewable decisions is well
+established~\cite{rudin_2019,zocholl_xai_law_enforcement_2025}; in practice,
+however, explanations are rendered for the requester and discarded, rather than
+stored as evidence bound to the decision they justify.
+
+There is also a failure mode that none of the audit mechanisms above can detect,
+and the scenario makes it concrete. Suppose the denial issued to the forensic
+scientist for the victim's identity is later rewritten into an approval by an
+attacker who controls the component that signs audit entries. The rewritten
+entry is signed with the genuine key, so its signature verifies, the chain
+remains intact, and every agency's copy of the ledger agrees. The inquiry
+authority in month six runs an integrity check and finds nothing wrong, yet the
+ledger now preserves a decision that policy never made. Integrity and
+correctness are separate properties: a signature answers whether the log was
+changed after writing, not whether what was written was true.
+
+This paper proposes SEBA-XAI, a Secure, Explainable, Blockchain-Audited
+access-governance overlay that addresses the scenario end to end. For every
+request, a policy service evaluates the attributes above and returns
+\emph{allow}, \emph{deny}, or \emph{escalate}. At decision time, the system
+records the grounds of the decision: the attributes that were decisive and the
+policy version applied. The decision and its grounds are committed to a
+permissioned blockchain audit trail shared by the participating agencies, so
+that no single agency can silently rewrite history, while raw records never
+leave the agency holding them. Because the re-signing attack defeats even this
+audit trail from the inside, the paper additionally evaluates detection methods
+that examine the recorded decisions rather than their signatures.
+
+\subsection{Practical Challenges}
+
+The paper is organised around four practical challenges taken directly from the
+scenario. Each challenge is paired with one contribution in the same order.
+
+\begin{itemize}
+    \item \textbf{Contextual access governance.} Access cannot be decided from
+    static roles: the constable and the investigating officer share a role but
+    not an assignment, and the forensic scientist's two requests differ only in
+    the record and purpose. The decision must consider the requester, record,
+    action, purpose, approval state, and operating context.
+
+    \item \textbf{Tamper-evident audit across agencies.} The inquiry authority
+    can trust the decision evidence only if no agency could have silently
+    changed it, and raw sensitive records must not be copied to a shared ledger
+    to achieve this.
+
+    \item \textbf{Explainable access decisions.} Every allow, deny, or escalate
+    outcome in the scenario must carry its grounds, because these decisions
+    affect investigation timelines, privacy protection, inter-agency
+    accountability, and later legal or administrative review.
+
+    \item \textbf{Valid-looking corrupted logs.} An attacker who controls a
+    signing component can rewrite a decision and re-sign it, so the audit trail
+    remains internally valid while recording a decision that was never made.
+\end{itemize}
+
+\subsection{Research Contributions}
+
+To address these challenges, the paper makes four contributions, ordered to
+match the challenges above.
+
+\begin{itemize}
+    \item \textbf{Contribution 1:} A layered access-control service that
+    combines role-based, attribute-based, and policy-based rules and returns
+    \emph{allow}, \emph{deny}, or \emph{escalate} for inter-agency record
+    requests, so that cases such as the constable's request and the forensic
+    scientist's second request are decided from context rather than role.
+
+    \item \textbf{Contribution 2:} A permissioned blockchain audit layer in
+    which each decision event records the request identifier, decision hash,
+    explanation hash, policy version, approval reference where one exists, and
+    record commitment, while raw records remain off-chain with the holding
+    agency.
+
+    \item \textbf{Contribution 3:} An explainable decision service that stores
+    the decisive attributes, reason code, policy version, and counterfactual
+    information as a structured artifact hash-linked to the audit event, so that
+    a reviewer can verify the grounds of a decision without opening the
+    underlying records.
+
+    \item \textbf{Contribution 4:} A reproducible adversarial benchmark covering
+    ordinary tampering attacks and the validly re-signed compromised-signer
+    attack. Across five seeds of a synthetic workload, every integrity-based
+    defence tested detects ordinary tampering but obtains 0.00 detection for the
+    re-signed attack, while two methods that examine the decisions themselves, a
+    statistical drift detector over the decision log and a trusted attribute
+    oracle, obtain 1.00 detection under stronger visibility assumptions.
+\end{itemize}
+
+The scope of the claims is deliberately limited. Real police access logs and
+records are not publicly available, so the evaluation uses a reproducible
+synthetic workload, and the blockchain layer is a simulated permissioned ledger
+rather than a live deployment. The paper does not claim deployment inside any
+operational system, legal compliance, validation on real police records, or
+production security. It also deliberately avoids crime prediction: aggregate
+public crime statistics are not individual-level access-control
+data~\cite{ncrb_2023}, predictive policing can create feedback loops when
+observed crime data is shaped by earlier policing
+decisions~\cite{ensign_feedback_2018}, and complex criminal-justice prediction
+systems do not reliably outperform simple
+baselines~\cite{dressel_fairness_limits_2018}. The subject of this paper is the
+governance of access, not the prediction of crime.
+
+The remainder of the paper is organised as follows.
+Section~\ref{sec:related} reviews related work.
+Section~\ref{sec:system} presents the SEBA-XAI architecture and the request
+lifecycle. Section~\ref{sec:threat} states the threat model and the benchmark
+design. Section~\ref{sec:results} reports the results, including the
+compromised-signer asymmetry. Section~\ref{sec:limitations} states the
+limitations, and Section~\ref{sec:conclusion} concludes.

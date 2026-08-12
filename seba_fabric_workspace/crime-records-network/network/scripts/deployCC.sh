@@ -37,11 +37,22 @@ infoln "Packaging ${CC_NAME} ${CC_VERSION}"
 peer lifecycle chaincode package "$PKG" \
   --path "${STAGING}/src" --lang node --label "${CC_NAME}_${CC_VERSION}"
 
+# The package ID is a hash of the package just built, so it must be computed
+# BEFORE the install loop and the loop must test for that exact ID. Testing for
+# the label instead is wrong: labels are not unique, and repackaging into a new
+# staging directory changes the hash while leaving the label identical. That
+# combination silently skips the install and then approves a package ID no peer
+# holds, producing "definition exists, but chaincode is not installed" on every
+# later invoke.
+setGlobals police
+PACKAGE_ID="$(peer lifecycle chaincode calculatepackageid "$PKG")"
+infoln "Package ID: ${PACKAGE_ID}"
+
 # --- install on every department peer ---------------------------------------
 for entry in "${ORGS[@]}"; do
   org="$(org_field "$entry" 1)"
   setGlobals "$org"
-  if peer lifecycle chaincode queryinstalled 2>/dev/null | grep -q "${CC_NAME}_${CC_VERSION}"; then
+  if peer lifecycle chaincode queryinstalled 2>/dev/null | grep -q "${PACKAGE_ID}"; then
     infoln "install: already present on peer0.${org}"
   else
     infoln "install: peer0.${org}"
@@ -49,9 +60,21 @@ for entry in "${ORGS[@]}"; do
   fi
 done
 
-setGlobals police
-PACKAGE_ID="$(peer lifecycle chaincode calculatepackageid "$PKG")"
-infoln "Package ID: ${PACKAGE_ID}"
+# Fabric requires the definition sequence to be exactly one greater than the
+# committed one, and 1 on a channel where this chaincode has never been
+# committed. A hardcoded value therefore breaks after every teardown and
+# rebuild, because the new ledger starts again at 1. Resolve it from the
+# channel unless the caller pinned an explicit number.
+if [ "$CC_SEQUENCE" = "auto" ]; then
+  COMMITTED_SEQ="$(peer lifecycle chaincode querycommitted \
+    --channelID "$CHANNEL_NAME" --name "$CC_NAME" --output json 2>/dev/null \
+    | jq -r '.sequence // 0' 2>/dev/null || true)"
+  case "$COMMITTED_SEQ" in
+    ''|*[!0-9]*) COMMITTED_SEQ=0 ;;
+  esac
+  CC_SEQUENCE=$(( COMMITTED_SEQ + 1 ))
+  infoln "Sequence: ${CC_SEQUENCE} (committed on channel: ${COMMITTED_SEQ})"
+fi
 
 # --- approve for all 5 orgs --------------------------------------------------
 for entry in "${ORGS[@]}"; do

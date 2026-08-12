@@ -1,169 +1,87 @@
-# How the system is built
+# Architecture
 
-Written to be readable without prior blockchain knowledge.
+## Trust and storage boundaries
 
-## The four parts
-
-```
-website  ──►  web server  ──►  rules running inside the blockchain  ──►  permanent record
-                   │
-                   ├──►  ordinary database: the actual case files, accounts, search log
-                   └──►  local AI: rewords a decision that was already made
+```text
+Browser -> Node API -> per-user Fabric Gateway -> five-organisation Fabric channel
+                    -> agency-controlled raw-content vault
+                    -> optional local LLM wording
 ```
 
-Two design choices carry most of the weight.
+Fabric is authoritative for departments, UserProfiles, cases, record/evidence
+metadata, access requests, decisions, approvals, custody, court workflow, policy
+versions, and audit events. The chaincode derives identity and attributes from
+the transaction's Fabric CA certificate and enforces authorization.
 
-### The case files are not on the blockchain
+Raw case narratives, personal documents, and evidence bytes are never written
+to the shared channel. They remain in the owning agency's vault. Fabric stores
+only `offChainReference`, `contentHash`, classification, lifecycle, and access
+evidence. The backend rehashes content before release and chaincode first proves
+that the exact signing identity has a grant.
 
-The blockchain stores facts *about* a record: its type, how sensitive it is, and
-a fingerprint (hash) of its contents. The file itself sits in the department's
-own database.
+The prototype uses no application PostgreSQL/SQLite database. CouchDB is
+Fabric's peer world-state projection; the ordered blockchain remains the source
+of history. Fabric CA's identity registry is infrastructure, not domain state.
 
-Why: a blockchain copies everything to all five departments, permanently. Putting
-case narratives on it would give every department a permanent copy of every police
-file — worse for privacy, not better. It would also make deletion impossible,
-which matters for juvenile records and court-ordered erasure.
+## Contracts
 
-### The decisions are made inside the blockchain, not in the website
-
-The web server cannot grant access. It can only pass on a request and record what
-the blockchain decided. The AI can only reword a decision after it was made.
-
-Why: rules that live in the website can be bypassed by anyone who talks to the
-server directly. Rules inside the blockchain run on all five departments' servers
-and must be agreed by three of them.
-
----
-
-## How a decision is made
-
-The code is in `chaincode/crimerecords/lib/policy/policyEngine.js`.
-
-Three sources of information are combined, and it matters which is which:
-
-| Information | Comes from | Can the requester fake it? |
-|---|---|---|
-| Who they are: role, rank, station, jurisdiction, clearance, credential status, case assignments | their signed digital certificate | **No** |
-| The record: type, sensitivity, juvenile/witness flags, sealed status, jurisdiction, case | the blockchain's own stored record | **No** |
-| What they want to do: view, export, annotate | their request | Yes |
-| The circumstances: purpose, time window, emergency flag, court link, approval token | their request | Yes |
-
-Only the last two come from the requester. Their identity and the record's facts
-cannot be tampered with by the person asking.
-
-### The eight rules, checked in order
-
-The first rule that matches gives the answer. Nothing after it runs.
-
-| # | If this is true | Answer | Reason code |
-|---|---|---|---|
-| 1 | Their credential is suspended or revoked | deny | `CRED_NOT_ACTIVE` |
-| 2 | No valid reason was given for the request | deny | `INVALID_PURPOSE` |
-| 3 | Their role has no permission for this action on this record type | deny | `RBAC_NO_PERMISSION` |
-| 4 | The record is sealed and they are not the court | escalate | `SEALED_RECORD` |
-| 5 | A juvenile is involved and their role is not permitted | escalate | `JUVENILE_PROTECTED` |
-| 6 | They are in a different jurisdiction | escalate — or allow with an emergency approval token | `CROSS_JURISDICTION` |
-| 7 | They are not assigned to this case | deny | `NOT_ASSIGNED` |
-| 8 | Their clearance is lower than the record's sensitivity | escalate | `INSUFFICIENT_CLEARANCE` |
-| — | Everything passed | allow | `POLICY_SATISFIED` |
-
-**The order matters.** Assignment (rule 7) is checked before clearance (rule 8),
-so an unassigned officer is told "you are not on this case" rather than "your
-clearance is too low". Reordering the rules would change which reasons appear in
-our results.
-
-Every rule returns four things, not one: the answer, a reason code, **which facts
-decided it**, and **what would have changed the outcome**. Because the explanation
-comes from the same code as the decision, the two can never disagree.
-
-The rules are **deterministic**: no randomness, no AI, no dependence on the clock.
-The same request always gives the same answer and the same reason. That is what
-makes the experiments repeatable.
-
----
-
-## The three programs inside the blockchain
-
-In `chaincode/crimerecords/lib/`:
-
-| Program | What it does |
+| Contract | Authoritative assets/actions |
 |---|---|
-| `recordContract.js` | Creates records, attaches evidence fingerprints, seals and unseals, searches |
-| `accessContract.js` | Handles access requests, runs the rules, stores the explanation, handles supervisor approvals |
-| `auditContract.js` | Lets reviewers verify explanations and files, rebuild a record's history, and anchor the search log |
+| `GovernanceContract` | Department, Case, assignment, prosecution/court workflow |
+| `UserContract` | identity-backed UserProfile, status, history |
+| `RecordContract` | RecordMetadata, EvidenceMetadata, custody, seal, authorized release |
+| `AccessContract` | AccessRequest, AccessDecision, pending escalation, Approval |
+| `AuditContract` | direct application events, explanation/payload verification, reconstruction |
+| `PolicyContract` | immutable versions and explicit activation/supersession |
 
-Two helper files: `identity.js` reads the facts out of the signed certificate and
-enforces which department may do what. `validate.js` checks incoming data and
-computes fingerprints.
+## Contextual decision
 
----
+The policy combines:
 
-## Two ways we detect tampering
+- subject: MSP, enrollment identity, role, rank, station, jurisdiction, and
+  clearance from X.509, verified against the UserProfile; current credential
+  state from UserProfile and assignment from the Case asset;
+- resource: record type, case, sensitivity, jurisdiction, owner, seal, and
+  juvenile/witness/victim protection flags from Fabric state;
+- action and context: view/export/annotate, purpose, emergency state, court
+  link, and approval-token commitment.
 
-### 1. Checking a case file has not been altered
+It returns `ALLOW`, `DENY`, or `ESCALATE` with a reason code, decisive
+attributes, counterfactual guidance, policy version, explanation hash, decision
+hash, and transaction evidence. A role by itself is never sufficient for
+sensitive raw content.
 
-When a record is filed, a fingerprint of the file is stored on the blockchain.
-Later, a reviewer can re-fingerprint whatever is in the department's database and
-compare. If someone edited the file directly in the database, the two no longer
-match.
+Current rule order is deterministic:
 
-### 2. Checking the search history has not been altered
+1. inactive credential -> deny;
+2. invalid purpose -> deny;
+3. role/action/record mismatch -> deny;
+4. sealed record outside court -> escalate;
+5. juvenile data outside the narrow exception -> deny;
+6. unnecessary victim-protected data -> deny;
+7. cross-jurisdiction request -> escalate unless narrowly approved emergency;
+8. missing case assignment -> deny;
+9. insufficient clearance -> escalate;
+10. auditor raw-content request -> deny metadata-only;
+11. otherwise -> allow.
 
-Searching and reading do not create blockchain transactions — only writing does.
-So who *looked* at a case would leave no trace.
+The browser's role-aware navigation is only a convenience. The backend validates
+requests, while the chaincode is the authorization boundary.
 
-We record every search and read in a list where each entry contains a fingerprint
-of the entry before it. This is called a **hash chain**: change or delete one
-entry and every entry after it stops matching.
+## Identity and login limitation
 
-Then, every 25 entries, the fingerprint at the end of the chain is written to the
-blockchain. Now the list cannot be rewritten at all, because doing so would
-contradict something already permanent.
+Fabric CA issues each X.509 identity. `UserContract` maps its enrollment ID to
+the public authorization profile and status; no password/hash is accepted.
 
-An **epoch** marker records when the list is deliberately rebuilt — for example
-when the database is recreated during development. Without it, a legitimate
-rebuild would look identical to tampering. The epoch is visible in the blockchain
-history, so a rebuild is allowed but never hidden.
+For local development, the backend holds all seeded MSP private keys and the
+login screen selects one. It then proves that key can call
+`AuthenticateCurrentUser`. This demonstrates Fabric identity mapping, but is
+not production end-user authentication. Production requires user-controlled or
+hardware-backed keys and secure identity federation.
 
----
+## XAI boundary
 
-## The AI wording layer
-
-In `backend/src/llm/`.
-
-The order of events matters:
-
-1. The blockchain rules decide and record the decision.
-2. The web server reads that decision **back from the blockchain** — not from the
-   browser, so nobody can ask for an explanation of a decision they invented.
-3. A prompt is built from a fixed list of safe fields.
-4. The local AI writes two or three sentences.
-5. The result is checked before it is shown.
-
-The check has two levels. **Problems** mean the AI said something false — for
-example claiming access was allowed when it was denied. That text is thrown away
-and fixed template wording is used instead. **Warnings** mean it is true but
-incomplete, such as leaving out what would have changed the outcome. That text is
-still shown, with the gap recorded.
-
-The prompt never contains the case narrative, the complainant's details, the
-badge number, the approval token or the evidence description. A test enforces
-this by planting marker strings and confirming they never appear.
-
-Generated text is never written to the blockchain. If it were, the permanent
-record would depend on something that can vary between runs.
-
----
-
-## The website
-
-In `frontend/`. Plain JavaScript, no build step — edit a file and refresh.
-
-Features are listed in one file, `js/modules/index.js`. Adding a screen means
-creating one file and adding one line there; the menu, the address bar and the
-role-based hiding all follow automatically. See `frontend/README.md`.
-
-The role lists in `frontend/js/core/access.js` decide what appears in the menu.
-**They are not security.** They stop officers seeing buttons that would fail
-anyway. The real checks are in the web server and, most importantly, in the
-blockchain.
+The deterministic structured explanation is created with the decision and is
+the auditable evidence. The optional local LLM may only reword this artifact.
+It receives no case narrative or personal details, cannot change authorization,
+and is rejected when grounding checks detect contradictions or invented facts.

@@ -1,10 +1,17 @@
 'use strict';
 
+/**
+ * Local demonstration sign-in backed by a Fabric identity and ledger profile.
+ * No password or password hash is stored. The backend proves it can sign with
+ * the selected enrolled identity, then issues the browser a short-lived JWT.
+ * Because development private keys are server-held, this is a custodial demo
+ * selector—not production proof of an end user's key possession.
+ */
+
 const express = require('express');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { z } = require('zod');
-const db = require('../db');
+const users = require('../fabric/users');
 const { JWT_SECRET, JWT_EXPIRY } = require('../config');
 const { ok, fail, asyncRoute } = require('../util/respond');
 const { requireAuth } = require('../middleware/auth');
@@ -13,27 +20,37 @@ const router = express.Router();
 
 const loginSchema = z.object({
   username: z.string().min(1).max(64),
-  password: z.string().min(1).max(128),
 });
 
 router.post('/login', asyncRoute(async (req, res) => {
   const parsed = loginSchema.safeParse(req.body);
-  if (!parsed.success) return fail(res, 'username and password are required');
+  if (!parsed.success) return fail(res, 'username is required');
 
-  const { username, password } = parsed.data;
-  const user = db.findUser(username);
-  if (!user || !bcrypt.compareSync(password, user.password_hash)) {
-    return fail(res, 'invalid credentials', 401);
+  const { username } = parsed.data;
+  const profile = await users.readForLogin(username);
+
+  if (!profile) return fail(res, 'Fabric identity is not registered', 401);
+
+  let user;
+  try {
+    user = await users.authenticate(profile.org, profile.fabricUser, username);
+  } catch (err) {
+    const message = String(err.message || err);
+    if (message.includes('account is')) {
+      return fail(res, message.replace(/^.*unauthorized: /, ''), 403);
+    }
+    return fail(res, 'Fabric identity could not be verified', 401);
   }
 
   const claims = {
-    username: user.username,
+    username: user.userId,
     org: user.org,
-    fabricUser: user.fabric_user,
+    fabricUser: user.fabricUser,
     role: user.role,
-    displayName: user.display_name,
+    displayName: user.displayName,
   };
   const token = jwt.sign(claims, JWT_SECRET, { expiresIn: JWT_EXPIRY });
+  req.user = claims;
   return ok(res, { token, user: claims });
 }));
 

@@ -7,7 +7,7 @@ chai.use(require('chai-as-promised'));
 const RecordContract = require('../lib/recordContract');
 const AccessContract = require('../lib/accessContract');
 const AuditContract = require('../lib/auditContract');
-const { buildMockContext, cloneInto, CALLERS, RECORD_META } = require('./testHelpers');
+const { buildMockContext, cloneInto, seedCase, CALLERS, RECORD_META } = require('./testHelpers');
 
 const records = new RecordContract();
 const access = new AccessContract();
@@ -15,6 +15,20 @@ const audit = new AuditContract();
 
 async function worldWithDecision() {
   const policeCtx = buildMockContext(CALLERS.inspector);
+  await seedCase(policeCtx, 'CASE-1', { assignedUsers: [CALLERS.inspector.identityId] });
+  await policeCtx.stub.putState(
+    policeCtx.stub.createCompositeKey('user', [CALLERS.inspector.identityId]),
+    Buffer.from(JSON.stringify({
+      docType: 'user', userId: CALLERS.inspector.identityId,
+      fabricUser: CALLERS.inspector.identityId, org: 'police',
+      role: CALLERS.inspector.attrs.role,
+      rank: CALLERS.inspector.attrs.rank,
+      station: CALLERS.inspector.attrs.station,
+      jurisdiction: CALLERS.inspector.attrs.jurisdiction,
+      clearance: CALLERS.inspector.attrs.clearance,
+      credentialStatus: 'active',
+    }))
+  );
   await records.CreateCaseRecord(policeCtx, 'FIR-1', JSON.stringify(RECORD_META));
   const event = JSON.parse(await access.RequestAccess(
     policeCtx, 'FIR-1', 'view', JSON.stringify({ purpose: 'investigation' })));
@@ -72,7 +86,7 @@ describe('AuditContract', () => {
       const { state } = await worldWithDecision();
       const ctx = asCaller(CALLERS.auditor, state);
       const good = JSON.parse(await audit.VerifyRecordPayload(
-        ctx, 'FIR-1', RECORD_META.payloadHash));
+        ctx, 'FIR-1', RECORD_META.contentHash));
       expect(good.match).to.equal(true);
       const bad = JSON.parse(await audit.VerifyRecordPayload(
         ctx, 'FIR-1', 'f'.repeat(64)));
@@ -86,80 +100,37 @@ describe('AuditContract', () => {
     });
   });
 
-  describe('AnchorAccessLog', () => {
-    const HEAD = 'a'.repeat(64);
-    const HEAD2 = 'b'.repeat(64);
-
-    it('lets an auditor anchor the off-chain log head', async () => {
-      const ctx = buildMockContext(CALLERS.auditor);
-      const anchor = JSON.parse(await audit.AnchorAccessLog(ctx, '25', HEAD, '25', 'ep-test'));
-      expect(anchor.seqNo).to.equal(25);
-      expect(anchor.headHash).to.equal(HEAD);
-      expect(anchor.anchoredByMsp).to.equal('AuditMSP');
-      expect(ctx._events[0].name).to.equal('AccessLogAnchored');
-    });
-
-    it('is restricted to the oversight organization', async () => {
+  describe('direct-ledger access events', () => {
+    it('derives the actor from the signing identity and stores the event', async () => {
       const ctx = buildMockContext(CALLERS.inspector);
-      await expect(audit.AnchorAccessLog(ctx, '25', HEAD, '25', 'ep-test'))
-        .to.be.rejectedWith(/requires membership in \[AuditMSP\]/);
+      const event = JSON.parse(await audit.RecordAccessEvent(
+        ctx, 'record.read', JSON.stringify({ recordId: 'FIR-1' }), 'ok', '200'));
+      expect(event.actorUsername).to.equal('insp.test');
+      expect(event.actorMsp).to.equal('PoliceMSP');
+      expect(event.action).to.equal('record.read');
+      expect(ctx._events[0].name).to.equal('ApplicationAccessRecorded');
     });
 
-    it('refuses a sequence number that does not advance', async () => {
-      // Re-anchoring an older head is how an attacker would try to hide the
-      // entries written after it.
-      const ctx = buildMockContext(CALLERS.auditor);
-      await audit.AnchorAccessLog(ctx, '50', HEAD, '50', 'ep-test');
-      await expect(audit.AnchorAccessLog(ctx, '50', HEAD2, '50', 'ep-test'))
-        .to.be.rejectedWith(/must advance/);
-      await expect(audit.AnchorAccessLog(ctx, '20', HEAD2, '20', 'ep-test'))
-        .to.be.rejectedWith(/must advance/);
+    it('allows reviewers to query and rejects ordinary departments', async () => {
+      const state = buildMockContext(CALLERS.inspector);
+      await audit.RecordAccessEvent(state, 'record.read', '{}', 'ok', '200');
+      const reviewer = asCaller(CALLERS.auditor, state);
+      const events = JSON.parse(await audit.QueryAccessEvents(reviewer, '50'));
+      expect(events).to.have.length(1);
+      await expect(audit.QueryAccessEvents(state, '50'))
+        .to.be.rejectedWith(/requires membership in/);
     });
 
-    it('rejects malformed hashes and counts', async () => {
-      const ctx = buildMockContext(CALLERS.auditor);
-      await expect(audit.AnchorAccessLog(ctx, '1', 'not-a-hash', '1', 'ep-test'))
-        .to.be.rejectedWith(/sha256/);
-      await expect(audit.AnchorAccessLog(ctx, '0', HEAD, '1', 'ep-test'))
-        .to.be.rejectedWith(/seqNo must be a positive integer/);
-      await expect(audit.AnchorAccessLog(ctx, '1', HEAD, 'x', 'ep-test'))
-        .to.be.rejectedWith(/entryCount must be a positive integer/);
-    });
-
-    it('returns null before anything is anchored, then the newest anchor', async () => {
-      const ctx = buildMockContext(CALLERS.auditor);
-      expect(JSON.parse(await audit.GetLatestAccessLogAnchor(ctx))).to.equal(null);
-      await audit.AnchorAccessLog(ctx, '10', HEAD, '10', 'ep-test');
-      await audit.AnchorAccessLog(ctx, '20', HEAD2, '10', 'ep-test');
-      const latest = JSON.parse(await audit.GetLatestAccessLogAnchor(ctx));
-      expect(latest.seqNo).to.equal(20);
-    });
-
-    it('lets a new epoch restart the sequence, and records which epoch', async () => {
-      // Recreating the off-chain log legitimately restarts numbering. The epoch
-      // change is permanently visible on-chain, so a wipe cannot be hidden.
-      const ctx = buildMockContext(CALLERS.auditor);
-      await audit.AnchorAccessLog(ctx, '80', HEAD, '80', 'ep-first');
-      const restarted = JSON.parse(
-        await audit.AnchorAccessLog(ctx, '5', HEAD2, '5', 'ep-second'));
-      expect(restarted.seqNo).to.equal(5);
-      expect(restarted.epoch).to.equal('ep-second');
-      const anchors = JSON.parse(await audit.GetAccessLogAnchors(ctx));
-      expect(anchors.map((a) => a.epoch)).to.deep.equal(['ep-first', 'ep-second']);
-    });
-
-    it('requires an epoch identifier', async () => {
-      const ctx = buildMockContext(CALLERS.auditor);
-      await expect(audit.AnchorAccessLog(ctx, '1', HEAD, '1', ''))
-        .to.be.rejectedWith(/epoch is required/);
-    });
-
-    it('keeps every past anchor, so older ranges stay checkable', async () => {
-      const ctx = buildMockContext(CALLERS.auditor);
-      await audit.AnchorAccessLog(ctx, '10', HEAD, '10', 'ep-test');
-      await audit.AnchorAccessLog(ctx, '20', HEAD2, '10', 'ep-test');
-      const anchors = JSON.parse(await audit.GetAccessLogAnchors(ctx));
-      expect(anchors.map((a) => a.seqNo)).to.deep.equal([10, 20]);
+    it('rejects malformed event fields and limits', async () => {
+      const ctx = buildMockContext(CALLERS.inspector);
+      await expect(audit.RecordAccessEvent(ctx, 'bad action!', '{}', 'ok', '200'))
+        .to.be.rejectedWith(/action/);
+      await expect(audit.RecordAccessEvent(ctx, 'record.read', '{}', 'maybe', '200'))
+        .to.be.rejectedWith(/outcome/);
+      await expect(audit.RecordAccessEvent(ctx, 'record.read', '{}', 'ok', '999'))
+        .to.be.rejectedWith(/statusCode/);
+      const reviewer = buildMockContext(CALLERS.auditor);
+      await expect(audit.QueryAccessEvents(reviewer, '0')).to.be.rejectedWith(/limit/);
     });
   });
 
@@ -170,7 +141,9 @@ describe('AuditContract', () => {
       const trail = JSON.parse(await audit.GetAuditTrail(ctx, 'FIR-1'));
       expect(trail.record.recordId).to.equal('FIR-1');
       expect(trail.recordHistory).to.have.length(1);
+      expect(trail.accessRequests).to.have.length(1);
       expect(trail.accessDecisions).to.have.length(1);
+      expect(trail.approvals).to.deep.equal([]);
       expect(trail.accessDecisions[0].decisionId).to.equal(event.decisionId);
       expect(trail.accessDecisions[0].explanation).to.exist;
     });

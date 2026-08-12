@@ -5,11 +5,15 @@ const chai = require('chai');
 chai.use(require('chai-as-promised'));
 
 const RecordContract = require('../lib/recordContract');
-const { buildMockContext, cloneInto, CALLERS, RECORD_META } = require('./testHelpers');
+const { sha256 } = require('../lib/util/validate');
+const { buildMockContext, cloneInto, seedCase, CALLERS, RECORD_META } = require('./testHelpers');
 
 const contract = new RecordContract();
 
 async function createRecord(ctx, recordId = 'FIR-1', meta = RECORD_META) {
+  const caseKey = ctx.stub.createCompositeKey('case', [meta.caseId]);
+  const existingCase = await ctx.stub.getState(caseKey);
+  if (!existingCase || existingCase.length === 0) await seedCase(ctx, meta.caseId);
   return contract.CreateCaseRecord(ctx, recordId, JSON.stringify(meta));
 }
 
@@ -56,9 +60,9 @@ describe('RecordContract', () => {
         .to.be.rejectedWith(/unknown fields not permitted: victimName/);
     });
 
-    it('rejects a malformed payload hash and a bad enum', async () => {
+    it('rejects a malformed content hash and a bad enum', async () => {
       const ctx = buildMockContext(CALLERS.inspector);
-      await expect(createRecord(ctx, 'FIR-1', { ...RECORD_META, payloadHash: 'zz' }))
+      await expect(createRecord(ctx, 'FIR-1', { ...RECORD_META, contentHash: 'zz' }))
         .to.be.rejectedWith(/invalid format/);
       await expect(createRecord(ctx, 'FIR-1', { ...RECORD_META, sensitivityLevel: 'ultra' }))
         .to.be.rejectedWith(/must be one of/);
@@ -159,6 +163,33 @@ describe('RecordContract', () => {
       const list = JSON.parse(await contract.ListEvidence(ctx, 'FIR-1'));
       expect(list).to.have.length(2);
     });
+
+    it('records custody transfers and enforces the current custodian', async () => {
+      const ctx = await withRecord();
+      await contract.AttachEvidenceHash(
+        ctx, 'FIR-1', 'EV-1', 'b'.repeat(64), 'lab intake',
+        'vault://forensics/EV-1');
+      const event = JSON.parse(await contract.TransferEvidenceCustody(
+        ctx, 'FIR-1', 'EV-1', 'CourtMSP', 'filed as exhibit'));
+      expect(event.fromMsp).to.equal('ForensicsMSP');
+      expect(event.toMsp).to.equal('CourtMSP');
+      const timeline = JSON.parse(await contract.QueryEvidenceCustody(ctx, 'FIR-1', 'EV-1'));
+      expect(timeline).to.have.length(1);
+      await expect(contract.TransferEvidenceCustody(
+        ctx, 'FIR-1', 'EV-1', 'PoliceMSP', 'take back'))
+        .to.be.rejectedWith(/current custodian/);
+    });
+
+    it('rejects invalid custody destinations and unknown evidence', async () => {
+      const ctx = await withRecord();
+      await contract.AttachEvidenceHash(ctx, 'FIR-1', 'EV-1', 'b'.repeat(64));
+      await expect(contract.TransferEvidenceCustody(
+        ctx, 'FIR-1', 'EV-1', 'MediaMSP', 'publish'))
+        .to.be.rejectedWith(/toMsp/);
+      await expect(contract.TransferEvidenceCustody(
+        ctx, 'FIR-1', 'EV-404', 'CourtMSP', 'file'))
+        .to.be.rejectedWith(/does not exist/);
+    });
   });
 
   describe('SealRecord / UnsealRecord', () => {
@@ -244,6 +275,34 @@ describe('RecordContract', () => {
       const ctx = buildMockContext(CALLERS.inspector);
       await expect(contract.GetRecord(ctx, 'FIR-404')).to.be.rejectedWith(/does not exist/);
       expect(await contract.RecordExists(ctx, 'FIR-404')).to.equal(false);
+    });
+  });
+
+  describe('AuthorizeRecordRead', () => {
+    it('returns only the governed off-chain reference after an identity-bound grant', async () => {
+      const ctx = buildMockContext(CALLERS.inspector);
+      await createRecord(ctx);
+      const decision = {
+        docType: 'accessDecision', decisionId: 'D-1', recordId: 'FIR-1',
+        status: 'granted',
+        subject: {
+          identityHash: sha256(ctx.clientIdentity.getID()),
+        },
+      };
+      await ctx.stub.putState(
+        ctx.stub.createCompositeKey('accessDecision', ['FIR-1', 'D-1']),
+        Buffer.from(JSON.stringify(decision))
+      );
+      const result = JSON.parse(await contract.AuthorizeRecordRead(ctx, 'FIR-1'));
+      expect(result.offChainReference).to.equal('vault://police/FIR-1');
+      expect(result).to.not.have.property('payload');
+    });
+
+    it('rejects a caller without an identity-bound grant', async () => {
+      const ctx = buildMockContext(CALLERS.inspector);
+      await createRecord(ctx);
+      await expect(contract.AuthorizeRecordRead(ctx, 'FIR-1'))
+        .to.be.rejectedWith(/no granted access decision/);
     });
   });
 });

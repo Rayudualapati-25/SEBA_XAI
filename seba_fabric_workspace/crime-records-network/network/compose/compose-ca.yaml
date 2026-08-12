@@ -1,4 +1,8 @@
 # Crime Records Access Network — Fabric CAs (one per department + orderer)
+#
+# Each CA owns its embedded registry under its mounted Fabric CA directory.
+# This is CA infrastructure, not application state; no external PostgreSQL
+# service is required by the prototype.
 
 networks:
   crime:

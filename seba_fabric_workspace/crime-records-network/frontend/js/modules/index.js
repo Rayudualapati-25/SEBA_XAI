@@ -33,8 +33,13 @@ import sealRecord from './seal-record.js';
 import auditTrail from './audit-trail.js';
 import payloadIntegrity from './payload-integrity.js';
 import accessLog from './access-log.js';
+import registerUser from './register-user.js';
+import userDirectory from './user-directory.js';
+import cases from './cases.js';
+import departments from './departments.js';
 
 export const MODULES = Object.freeze([
+  cases,
   fileRecord,
   searchRecords,
   recordLookup,
@@ -44,10 +49,13 @@ export const MODULES = Object.freeze([
   auditTrail,
   payloadIntegrity,
   accessLog,
+  registerUser,
+  departments,
+  userDirectory,
 ]);
 
 /** Sidebar section order. Groups not listed here appear last, alphabetically. */
-export const GROUP_ORDER = Object.freeze(['Records', 'Review', 'Audit']);
+export const GROUP_ORDER = Object.freeze(['Records', 'Review', 'Audit', 'People']);
 
 export function moduleById(id) {
   return MODULES.find((module) => module.id === id) || null;

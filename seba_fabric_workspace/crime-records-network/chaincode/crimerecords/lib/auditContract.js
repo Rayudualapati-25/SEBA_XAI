@@ -3,22 +3,20 @@
 /**
  * AuditContract — verification and reconstruction for reviewers.
  *
- * Fixes the "caller-supplied vs caller-supplied" anchor check from the
- * previous chaincode: verification always recomputes from LEDGER state and
- * compares against what the caller claims to hold, never claim-vs-claim.
+ * Record verification and authenticated application-access events are both
+ * derived from Fabric state. There is no external audit-log database to
+ * anchor or reconcile.
  */
 
 const { Contract } = require('fabric-contract-api');
 const { MSP, getCaller, requireMsp } = require('./util/identity');
-const { hashObject, SHA256_HEX, SAFE_ID } = require('./util/validate');
+const { hashObject, SAFE_ID } = require('./util/validate');
 
-const ACCESS_KEY = 'access';
+const REQUEST_KEY = 'accessRequest';
+const ACCESS_KEY = 'accessDecision';
+const APPROVAL_KEY = 'approval';
 const RECORD_KEY = 'record';
-
-// Single key holding the newest access-log anchor. Fabric keeps the history of
-// every key, so getHistoryForKey on this one key returns every anchor ever
-// written — no composite keys or indexes needed.
-const ACCESS_LOG_HEAD = 'accessLogHead';
+const ACCESS_EVENT_KEY = 'accessEvent';
 
 // Reviewer orgs: auditors, the court, and prosecution can reconstruct trails.
 const REVIEWER_MSPS = [MSP.AUDIT, MSP.COURT, MSP.PROSECUTION];
@@ -50,11 +48,10 @@ class AuditContract extends Contract {
   }
 
   /**
-   * Verify an off-chain record payload against its on-chain commitment.
-   * The claimed hash is recomputed by the CLIENT over the payload it holds;
-   * the reference hash always comes from ledger state.
+   * Compare the hash recomputed by the backend over agency-held raw content
+   * with the immutable commitment in Fabric metadata.
    */
-  async VerifyRecordPayload(ctx, recordId, payloadHashHex) {
+  async VerifyRecordPayload(ctx, recordId, contentHash) {
     const key = ctx.stub.createCompositeKey(RECORD_KEY, [recordId]);
     const data = await ctx.stub.getState(key);
     if (!data || data.length === 0) {
@@ -62,100 +59,78 @@ class AuditContract extends Contract {
     }
     const record = JSON.parse(data.toString());
     return JSON.stringify({
-      match: record.payloadHash === payloadHashHex,
-      storedHash: record.payloadHash,
+      match: record.contentHash === contentHash,
+      storedHash: record.contentHash,
+      computedHash: contentHash,
+      storage: 'agency-controlled-off-chain-vault',
     });
   }
 
   /**
-   * Commit the head hash of the off-chain access log to the ledger.
-   *
-   * The access log (who searched, who read a record, who received a case file)
-   * lives off-chain as a hash chain, because writing a blockchain transaction
-   * per search would be far too slow. Anchoring its head hash here binds that
-   * chain to the ledger: the log cannot be rewritten afterwards without
-   * contradicting an anchor that is already immutable.
-   *
-   * Oversight function, so AuditMSP only. The sequence number must advance,
-   * otherwise an attacker could re-anchor an older head to hide later entries.
+   * Commit one authenticated API access event. The actor is always derived
+   * from the signing certificate; callers cannot name a different actor.
    */
-  async AnchorAccessLog(ctx, seqNo, headHash, entryCount, epoch) {
+  async RecordAccessEvent(ctx, action, targetJson, outcome, statusCode) {
     const caller = getCaller(ctx);
-    requireMsp(caller, [MSP.AUDIT], 'AnchorAccessLog');
-
-    const seq = Number(seqNo);
-    const count = Number(entryCount);
-    if (!Number.isInteger(seq) || seq < 1) {
-      throw new Error('seqNo must be a positive integer');
+    if (!SAFE_ID.test(action || '')) {
+      throw new Error('action must be a simple identifier');
     }
-    if (!Number.isInteger(count) || count < 1) {
-      throw new Error('entryCount must be a positive integer');
+    if (!['ok', 'failed', 'refused', 'rejected', 'error'].includes(outcome)) {
+      throw new Error('outcome is invalid');
     }
-    if (!SHA256_HEX.test(headHash)) {
-      throw new Error('headHash must be a sha256 hex digest');
+    const status = Number(statusCode);
+    if (!Number.isInteger(status) || status < 100 || status > 599) {
+      throw new Error('statusCode must be an HTTP status integer');
     }
-    if (!SAFE_ID.test(epoch || '')) {
-      throw new Error('epoch is required and must be a simple identifier');
+    let target = null;
+    try {
+      target = JSON.parse(targetJson);
+    } catch {
+      throw new Error('target must be valid JSON');
     }
-
-    // The epoch identifies one continuous run of the log. If the off-chain log
-    // is ever recreated the epoch changes, and the sequence may legitimately
-    // restart. That is allowed but never hidden: every epoch ever anchored stays
-    // in this key's history, so an auditor can see the log was reset and when.
-    const existing = await ctx.stub.getState(ACCESS_LOG_HEAD);
-    if (existing && existing.length > 0) {
-      const previous = JSON.parse(existing.toString());
-      if (previous.epoch === epoch && seq <= previous.seqNo) {
-        throw new Error(
-          `seqNo must advance within an epoch: ${seq} is not greater than the anchored ${previous.seqNo}`
-        );
-      }
+    if (Buffer.byteLength(targetJson, 'utf8') > 2048) {
+      throw new Error('target exceeds 2048 byte limit');
     }
 
-    const anchor = {
-      docType: 'accessLogAnchor',
-      epoch,
-      seqNo: seq,
-      headHash,
-      entryCount: count,
-      anchoredByMsp: caller.mspId,
-      anchoredAtUtc: ctx.stub.getDateTimestamp().toISOString(),
+    const timestamp = ctx.stub.getDateTimestamp().toISOString();
+    const event = {
+      docType: 'applicationAccessEvent',
+      actorIdentityHash: hashObject({ id: caller.id }),
+      actorUsername: caller.enrollmentId,
+      actorMsp: caller.mspId,
+      actorRole: caller.role,
+      action,
+      target,
+      outcome,
+      status,
+      timestamp,
       txId: ctx.stub.getTxID(),
     };
-    await ctx.stub.putState(ACCESS_LOG_HEAD, Buffer.from(JSON.stringify(anchor)));
-    ctx.stub.setEvent('AccessLogAnchored', Buffer.from(JSON.stringify({
-      seqNo: seq, headHash,
+    const key = ctx.stub.createCompositeKey(ACCESS_EVENT_KEY, [timestamp, event.txId]);
+    await ctx.stub.putState(key, Buffer.from(JSON.stringify(event)));
+    ctx.stub.setEvent('ApplicationAccessRecorded', Buffer.from(JSON.stringify({
+      action, outcome, txId: event.txId,
     })));
-    return JSON.stringify(anchor);
+    return JSON.stringify(event);
   }
 
-  /** The newest anchor, or null if the log has never been anchored. */
-  async GetLatestAccessLogAnchor(ctx) {
-    const data = await ctx.stub.getState(ACCESS_LOG_HEAD);
-    if (!data || data.length === 0) return JSON.stringify(null);
-    return data.toString();
-  }
-
-  /**
-   * Every anchor ever written, oldest first. Comes free from Fabric's key
-   * history, so an auditor can check the log against each historical anchor
-   * rather than only the newest one.
-   */
-  async GetAccessLogAnchors(ctx) {
-    const iterator = await ctx.stub.getHistoryForKey(ACCESS_LOG_HEAD);
-    const anchors = [];
+  /** Review the newest direct-ledger access events. */
+  async QueryAccessEvents(ctx, limitText) {
+    const caller = getCaller(ctx);
+    requireMsp(caller, REVIEWER_MSPS, 'QueryAccessEvents');
+    const requested = Number(limitText || 50);
+    if (!Number.isInteger(requested) || requested < 1 || requested > 500) {
+      throw new Error('limit must be an integer from 1 to 500');
+    }
+    const iterator = await ctx.stub.getStateByPartialCompositeKey(ACCESS_EVENT_KEY, []);
+    const events = [];
     let res = await iterator.next();
     while (!res.done) {
-      if (res.value.value.length > 0) {
-        anchors.push({
-          txId: res.value.txId,
-          ...JSON.parse(res.value.value.toString()),
-        });
-      }
+      events.push(JSON.parse(res.value.value.toString()));
       res = await iterator.next();
     }
     await iterator.close();
-    return JSON.stringify(anchors);
+    return JSON.stringify(events.slice(-requested).reverse());
   }
 
   /**
@@ -195,11 +170,36 @@ class AuditContract extends Contract {
     }
     await decIterator.close();
 
+    const requests = [];
+    for (const decision of decisions) {
+      const requestData = await ctx.stub.getState(
+        ctx.stub.createCompositeKey(REQUEST_KEY, [decision.requestId])
+      );
+      if (requestData && requestData.length > 0) {
+        requests.push(JSON.parse(requestData.toString()));
+      }
+    }
+
+    const approvals = [];
+    for (const request of requests) {
+      const approvalIterator = await ctx.stub.getStateByPartialCompositeKey(
+        APPROVAL_KEY, [request.requestId]
+      );
+      let approvalResult = await approvalIterator.next();
+      while (!approvalResult.done) {
+        approvals.push(JSON.parse(approvalResult.value.value.toString()));
+        approvalResult = await approvalIterator.next();
+      }
+      await approvalIterator.close();
+    }
+
     return JSON.stringify({
       recordId,
       record: JSON.parse(recordData.toString()),
       recordHistory: history,
+      accessRequests: requests,
       accessDecisions: decisions,
+      approvals,
       generatedAtUtc: ctx.stub.getDateTimestamp().toISOString(),
     });
   }

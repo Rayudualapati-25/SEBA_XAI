@@ -17,10 +17,11 @@ infoln() { printf '\033[0;34m%s\033[0m\n' "$1"; }
 # org|username|attrs
 USERS=(
   "police|insp.sharma|role=inspector:ecert,rank=3:ecert,station=PS-Central:ecert,jurisdiction=district-north:ecert,badgeId=B-1001:ecert,clearance=high:ecert,credentialStatus=active:ecert,caseAssignments=CASE-2026-001|CASE-2026-002:ecert"
-  "police|const.verma|role=constable:ecert,rank=1:ecert,station=PS-Central:ecert,jurisdiction=district-north:ecert,badgeId=B-2002:ecert,clearance=low:ecert,credentialStatus=active:ecert,caseAssignments=CASE-2026-001:ecert"
+  "police|const.verma|role=constable:ecert,rank=1:ecert,station=PS-Central:ecert,jurisdiction=district-north:ecert,badgeId=B-2002:ecert,clearance=low:ecert,credentialStatus=active:ecert"
   "police|sho.reddy|role=sho:ecert,rank=4:ecert,station=PS-Central:ecert,jurisdiction=district-north:ecert,badgeId=B-0100:ecert,clearance=high:ecert,credentialStatus=active:ecert"
   "police|io.krishnan|role=investigating-officer:ecert,rank=3:ecert,station=PS-Central:ecert,jurisdiction=district-north:ecert,badgeId=B-3003:ecert,clearance=high:ecert,credentialStatus=active:ecert,caseAssignments=CASE-2026-001:ecert"
   "police|insp.rathore|role=inspector:ecert,rank=3:ecert,station=PS-East:ecert,jurisdiction=district-north:ecert,badgeId=B-4004:ecert,clearance=high:ecert,credentialStatus=revoked:ecert,caseAssignments=CASE-2026-001:ecert"
+  "police|insp.singh|role=inspector:ecert,rank=3:ecert,station=PS-South:ecert,jurisdiction=district-south:ecert,badgeId=B-5005:ecert,clearance=high:ecert,credentialStatus=active:ecert,caseAssignments=CASE-2026-001:ecert"
   "forensics|analyst.rao|role=lab-analyst:ecert,station=FSL-North:ecert,jurisdiction=district-north:ecert,badgeId=F-3001:ecert,clearance=medium:ecert,credentialStatus=active:ecert,caseAssignments=CASE-2026-001:ecert"
   "forensics|dir.iyer|role=lab-director:ecert,station=FSL-North:ecert,jurisdiction=district-north:ecert,badgeId=F-0001:ecert,clearance=high:ecert,credentialStatus=active:ecert"
   "prosecution|pp.mehta|role=public-prosecutor:ecert,jurisdiction=district-north:ecert,badgeId=P-5001:ecert,clearance=high:ecert,credentialStatus=active:ecert"

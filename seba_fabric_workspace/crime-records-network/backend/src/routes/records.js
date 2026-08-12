@@ -1,10 +1,9 @@
 'use strict';
 
 const express = require('express');
-const crypto = require('crypto');
 const { z } = require('zod');
-const db = require('../db');
 const fabric = require('../fabric/gateway');
+const vault = require('../storage/vault');
 const { ok, fail, asyncRoute } = require('../util/respond');
 const { requireAuth, requireRole } = require('../middleware/auth');
 
@@ -25,6 +24,7 @@ const createSchema = z.object({
     witnessFlag: z.boolean().optional(),
     owningStation: z.string().regex(SAFE_ID),
     jurisdiction: z.string().regex(SAFE_ID),
+    victimProtectionFlag: z.boolean().optional(),
   }),
 });
 
@@ -54,7 +54,7 @@ router.get('/', asyncRoute(async (req, res) => {
   return ok(res, records);
 }));
 
-/** File a record: payload -> SQLite (off-chain), hash + meta -> ledger. */
+/** Store raw content in the agency vault, then commit its metadata/hash to Fabric. */
 router.post('/', requireRole('constable', 'sub-inspector', 'inspector', 'sho',
   'investigating-officer'),
   asyncRoute(async (req, res) => {
@@ -62,17 +62,23 @@ router.post('/', requireRole('constable', 'sub-inspector', 'inspector', 'sho',
     if (!parsed.success) return fail(res, parsed.error.issues[0].message);
     const { recordId, payload, meta } = parsed.data;
 
-    if (db.getPayload(recordId)) return fail(res, `record '${recordId}' already exists off-chain`, 409);
-
-    const payloadText = JSON.stringify(payload);
-    const payloadHash = crypto.createHash('sha256').update(payloadText, 'utf8').digest('hex');
-
-    const record = await fabric.submit(
-      req.user.org, req.user.fabricUser, 'RecordContract', 'CreateCaseRecord',
-      recordId,
-      JSON.stringify({ ...meta, payloadHash, offchainUri: `offchain://records/${recordId}` })
-    );
-    db.savePayload(recordId, payloadText, req.user.username);
+    const commitment = vault.save(req.user.org, recordId, payload);
+    let record;
+    try {
+      record = await fabric.submit(
+        req.user.org, req.user.fabricUser, 'RecordContract', 'CreateCaseRecord',
+        recordId, JSON.stringify({
+          ...meta,
+          owningAgency: req.user.org,
+          contentHash: commitment.contentHash,
+          offChainReference: commitment.offChainReference,
+          status: 'active',
+        })
+      );
+    } catch (err) {
+      if (commitment.created) vault.rollback(commitment.offChainReference);
+      throw err;
+    }
     return ok(res, record, 201);
   }));
 
@@ -84,31 +90,30 @@ router.get('/:recordId', asyncRoute(async (req, res) => {
 }));
 
 /**
- * Off-chain payload — released only when the ledger holds a granted (or
- * escalation-approved) decision for this record made by THIS subject context.
+ * Off-chain raw content. Chaincode first verifies that the exact signing X.509
+ * identity owns a grant, then the backend validates the file against Fabric's
+ * content hash before release.
  */
 router.get('/:recordId/payload', asyncRoute(async (req, res) => {
-  const decisions = await fabric.evaluate(
-    req.user.org, req.user.fabricUser, 'AccessContract', 'QueryDecisionsByRecord',
+  const authorization = await fabric.evaluate(
+    req.user.org, req.user.fabricUser, 'RecordContract', 'AuthorizeRecordRead',
     req.params.recordId);
-  const granted = decisions.find((d) =>
-    (d.status === 'granted' || d.status === 'approved-after-escalation') &&
-    d.subject.role === req.user.role);
-  if (!granted) {
-    return fail(res, 'no granted access decision on the ledger for this record and role', 403);
+  const stored = vault.read(authorization.offChainReference);
+  if (stored.currentHash !== authorization.contentHash) {
+    return fail(res, 'raw content integrity check failed', 409);
   }
-  const row = db.getPayload(req.params.recordId);
-  if (!row) return fail(res, 'payload not found in off-chain store', 404);
   return ok(res, {
     recordId: req.params.recordId,
-    payload: JSON.parse(row.payload),
-    grantedByDecision: granted.decisionId,
+    payload: stored.payload,
+    grantedByDecision: authorization.grantedByDecision,
+    contentHash: authorization.contentHash,
   });
 }));
 
 const evidenceSchema = z.object({
   evidenceId: z.string().regex(SAFE_ID),
   artifact: z.string().min(1),
+  source: z.string().min(1).max(200).default('agency-submission'),
   detail: z.string().max(2000).optional(),
 });
 
@@ -117,14 +122,20 @@ router.post('/:recordId/evidence', requireRole('lab-analyst', 'lab-director'),
   asyncRoute(async (req, res) => {
     const parsed = evidenceSchema.safeParse(req.body);
     if (!parsed.success) return fail(res, parsed.error.issues[0].message);
-    const { evidenceId, artifact, detail } = parsed.data;
-
-    const evidenceHash = crypto.createHash('sha256').update(artifact, 'utf8').digest('hex');
+    const { evidenceId, artifact, detail, source } = parsed.data;
+    const vaultId = `${req.params.recordId.slice(0, 60)}--${evidenceId.slice(0, 60)}`;
+    const commitment = vault.save(req.user.org, vaultId, { artifact });
     const transient = detail ? { evidenceDetail: Buffer.from(detail, 'utf8') } : undefined;
-
-    const result = await fabric.submitWithTransient(
-      req.user.org, req.user.fabricUser, 'RecordContract', 'AttachEvidenceHash',
-      [req.params.recordId, evidenceId, evidenceHash], transient);
+    let result;
+    try {
+      result = await fabric.submitWithTransient(
+        req.user.org, req.user.fabricUser, 'RecordContract', 'AttachEvidenceHash',
+        [req.params.recordId, evidenceId, commitment.contentHash, source,
+          commitment.offChainReference], transient);
+    } catch (err) {
+      if (commitment.created) vault.rollback(commitment.offChainReference);
+      throw err;
+    }
     return ok(res, result, 201);
   }));
 
@@ -140,6 +151,26 @@ router.get('/:recordId/evidence/:evidenceId/detail', asyncRoute(async (req, res)
     req.user.org, req.user.fabricUser, 'RecordContract', 'GetEvidenceDetail',
     req.params.recordId, req.params.evidenceId);
   return ok(res, detail);
+}));
+
+const custodySchema = z.object({
+  toMsp: z.enum(['PoliceMSP', 'ForensicsMSP', 'CourtMSP']),
+  reason: z.string().min(1).max(500),
+});
+router.post('/:recordId/evidence/:evidenceId/custody', asyncRoute(async (req, res) => {
+  const parsed = custodySchema.safeParse(req.body);
+  if (!parsed.success) return fail(res, parsed.error.issues[0].message);
+  const event = await fabric.submit(
+    req.user.org, req.user.fabricUser, 'RecordContract', 'TransferEvidenceCustody',
+    req.params.recordId, req.params.evidenceId, parsed.data.toMsp, parsed.data.reason);
+  return ok(res, event);
+}));
+
+router.get('/:recordId/evidence/:evidenceId/custody', asyncRoute(async (req, res) => {
+  const events = await fabric.evaluate(
+    req.user.org, req.user.fabricUser, 'RecordContract', 'QueryEvidenceCustody',
+    req.params.recordId, req.params.evidenceId);
+  return ok(res, events);
 }));
 
 /** Court seals / unseals. */

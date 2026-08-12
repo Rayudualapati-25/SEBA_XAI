@@ -53,17 +53,35 @@ function evaluate(subject, record, action, env) {
       `role '${subject.role}' has no '${action}' permission on '${record.recordType}'`);
   }
 
+  // Rule 3b — oversight reconstructs metadata, decisions and hashes through
+  // AuditContract. It never receives protected raw case content.
+  if (['auditor', 'ombudsman'].includes(subject.role) && action === 'view') {
+    return result('deny', 'AUDIT_METADATA_ONLY', ['subject.role', 'action'],
+      'use the audit-trail query, which excludes protected raw content');
+  }
+
   // Rule 4 — sealed records escalate for everyone except the court itself.
   if (record.sealed && subject.mspId !== 'CourtMSP') {
     return result('escalate', 'SEALED_RECORD', ['object.sealed', 'subject.mspId'],
       'decision would be evaluated normally if the record were not sealed');
   }
 
-  // Rule 5 — juvenile protection: restricted roles escalate.
+  // Rule 5 — juvenile protection is a hard deny except for the narrowly
+  // enumerated legal roles. Rank alone never overrides this rule.
   if (record.juvenileFlag && !JUVENILE_ALLOWED.includes(subject.role)) {
-    return result('escalate', 'JUVENILE_PROTECTED',
+    return result('deny', 'JUVENILE_PROTECTED',
       ['object.juvenileFlag', 'subject.role'],
-      'a supervisory approval is required because the record involves a juvenile');
+      'access requires a role explicitly authorized by the juvenile-protection policy');
+  }
+
+  // Rule 5b — data minimization for forensic work. Evidence metadata remains
+  // queryable, but a forensic identity does not receive a victim-protected raw
+  // record merely because it has an evidence-analysis role.
+  if (record.victimProtectionFlag
+      && [ 'lab-analyst', 'lab-director' ].includes(subject.role)) {
+    return result('deny', 'VICTIM_DATA_NOT_NECESSARY',
+      ['object.victimProtectionFlag', 'subject.role', 'env.purpose'],
+      'request a purpose-specific evidence artifact that excludes victim identity data');
   }
 
   // Rule 6 — jurisdiction: cross-jurisdiction requests escalate unless the

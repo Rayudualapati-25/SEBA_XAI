@@ -66,10 +66,22 @@ describe('policyEngine.evaluate', () => {
     expect(r.decision).to.equal('allow');
   });
 
-  it('escalates juvenile records for non-privileged roles (rule 5)', () => {
+  it('denies juvenile records for roles outside the narrow legal exception (rule 5)', () => {
     const r = evaluate(baseSubject, { ...baseRecord, juvenileFlag: true }, 'view', baseEnv);
-    expect(r.decision).to.equal('escalate');
+    expect(r.decision).to.equal('deny');
     expect(r.reasonCode).to.equal('JUVENILE_PROTECTED');
+  });
+
+  it('denies victim-protected raw content to forensics under data minimization', () => {
+    const analyst = {
+      ...baseSubject, mspId: 'ForensicsMSP', role: 'lab-analyst',
+      caseAssignments: 'CASE-1', clearance: 'medium',
+    };
+    const result = evaluate(analyst, {
+      ...baseRecord, recordType: 'evidence', victimProtectionFlag: true,
+    }, 'view', { purpose: 'forensic-analysis' });
+    expect(result.decision).to.equal('deny');
+    expect(result.reasonCode).to.equal('VICTIM_DATA_NOT_NECESSARY');
   });
 
   it('escalates cross-jurisdiction requests (rule 6)', () => {
@@ -102,12 +114,13 @@ describe('policyEngine.evaluate', () => {
     expect(r.reasonCode).to.equal('NOT_ASSIGNED');
   });
 
-  it('exempts judges and auditors from assignment checks (rule 7)', () => {
+  it('denies raw content to auditors while retaining metadata-only review', () => {
     const auditor = {
       ...baseSubject, mspId: 'AuditMSP', role: 'auditor', caseAssignments: null,
     };
     const r = evaluate(auditor, baseRecord, 'view', { purpose: 'audit-review' });
-    expect(r.decision).to.equal('allow');
+    expect(r.decision).to.equal('deny');
+    expect(r.reasonCode).to.equal('AUDIT_METADATA_ONLY');
   });
 
   it('escalates insufficient clearance (rule 8)', () => {

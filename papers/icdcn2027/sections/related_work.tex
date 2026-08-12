@@ -1,0 +1,65 @@
+\section{Related Work}
+\label{sec:related}
+
+\subsection{Contextual access control}
+
+RBAC represents permissions through roles and remains useful as a coarse
+administrative mechanism~\cite{sandhu_rbac_1996}. It does not, by itself,
+express whether an officer is currently assigned to a case, whether a request
+crosses a jurisdiction, or whether the requested field is necessary for a
+declared purpose. ABAC instead evaluates subject, object, action, and
+environment attributes against policy~\cite{nist_abac_2014}; XACML is a
+well-known policy language and architecture for this style of
+evaluation~\cite{oasis_xacml_2013}. Work on Fabric-based ABAC and accountable
+privacy-preserving access control demonstrates that fine-grained policy and
+ledger-backed accountability can be combined~\cite{zhao_fabric_abac_2022,hu_accountable_private_ac_2024}.
+
+SEBA-XAI uses this lineage but makes a narrower systems choice. Subject
+attributes are obtained from the signing certificate and current ledger state,
+not accepted as request fields. Object attributes are read from committed
+metadata. The requester supplies only an allow-listed action and purpose. The
+contribution is therefore not ABAC itself, but an implementation in which the
+authorisation result and a structured justification arise from the same
+endorsed transaction.
+
+\subsection{Permissioned audit and evidence provenance}
+
+Permissioned ledgers are suited to organisations that need known membership,
+replicated history, and policy-governed writes. Hyperledger Fabric provides the
+relevant building blocks: membership identities, endorsing peers, ordering, and
+application chaincode~\cite{androulaki_fabric_2018}. NIST's analysis of
+blockchain access control likewise identifies auditability and shared
+governance as potential benefits while retaining privacy and scalability as
+design constraints~\cite{nist_blockchain_access_2022}.
+
+Prior work applies blockchain to digital-evidence lifecycle and custody
+management~\cite{jeong_fabric_evidence_2020,kim_two_level_2021,li_lechain_2021}
+and to auditable distributed business-process access
+control~\cite{akhtar_auditable_access_2020}. These designs motivate recording
+commitments rather than sensitive payloads. They do not imply that a ledger
+entry is correct merely because it is immutable. A ledger can establish
+agreement about a committed transaction; it cannot independently establish the
+truth of compromised identity attributes or other premises used during policy
+evaluation. This distinction drives the threat analysis in
+Section~\ref{sec:method}.
+
+\subsection{Explainability for high-stakes review}
+
+Explanation methods such as LIME and SHAP are often used to interpret learned
+models~\cite{ribeiro_lime_2016,lundberg_shap_2017}, and counterfactuals offer a
+way to describe changes that would alter an automated
+outcome~\cite{wachter_counterfactual_2018}. For a deterministic access policy,
+however, a rule trace is more direct than a post-hoc attribution. This choice
+also follows the caution that high-stakes decisions should prefer inherently
+interpretable mechanisms where they are adequate~\cite{rudin_2019}. Recent
+law-enforcement XAI work stresses stakeholder-specific explanations and the
+risk of automation bias~\cite{zocholl_xai_law_enforcement_2025}.
+
+Blockchain-supported XAI audit proposals have considered anchoring explanation
+artifacts~\cite{nassar_blockchain_xai_2020,malhotra_xai_audit_2021}. SEBA-XAI
+uses no model to make an access decision. Instead, it records the deterministic
+reason code, decisive attributes, policy version, and counterfactual as a
+machine-checkable explanation artifact that is hash-linked to the audit event.
+Natural-language rendering, when enabled in the prototype, is a post-decision
+presentation step and cannot affect authorisation.
+

@@ -63,6 +63,11 @@ services:
     environment:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=adminpw
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:5984/_up || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
     ports:
       - "5984:5984"
     networks:
@@ -74,7 +79,8 @@ services:
     labels:
       service: hyperledger-fabric
     depends_on:
-      - couchdb-police
+      couchdb-police:
+        condition: service_healthy
     environment:
       - FABRIC_CFG_PATH=/etc/hyperledger/peercfg
       - FABRIC_LOGGING_SPEC=INFO
@@ -122,6 +128,11 @@ services:
     environment:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=adminpw
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:5984/_up || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
     ports:
       - "6984:5984"
     networks:
@@ -133,7 +144,8 @@ services:
     labels:
       service: hyperledger-fabric
     depends_on:
-      - couchdb-forensics
+      couchdb-forensics:
+        condition: service_healthy
     environment:
       - FABRIC_CFG_PATH=/etc/hyperledger/peercfg
       - FABRIC_LOGGING_SPEC=INFO
@@ -181,6 +193,11 @@ services:
     environment:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=adminpw
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:5984/_up || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
     ports:
       - "7984:5984"
     networks:
@@ -192,7 +209,8 @@ services:
     labels:
       service: hyperledger-fabric
     depends_on:
-      - couchdb-prosecution
+      couchdb-prosecution:
+        condition: service_healthy
     environment:
       - FABRIC_CFG_PATH=/etc/hyperledger/peercfg
       - FABRIC_LOGGING_SPEC=INFO
@@ -240,6 +258,11 @@ services:
     environment:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=adminpw
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:5984/_up || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
     ports:
       - "8984:5984"
     networks:
@@ -251,7 +274,8 @@ services:
     labels:
       service: hyperledger-fabric
     depends_on:
-      - couchdb-court
+      couchdb-court:
+        condition: service_healthy
     environment:
       - FABRIC_CFG_PATH=/etc/hyperledger/peercfg
       - FABRIC_LOGGING_SPEC=INFO
@@ -299,6 +323,11 @@ services:
     environment:
       - COUCHDB_USER=admin
       - COUCHDB_PASSWORD=adminpw
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf http://localhost:5984/_up || exit 1"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
     ports:
       - "9984:5984"
     networks:
@@ -310,7 +339,8 @@ services:
     labels:
       service: hyperledger-fabric
     depends_on:
-      - couchdb-audit
+      couchdb-audit:
+        condition: service_healthy
     environment:
       - FABRIC_CFG_PATH=/etc/hyperledger/peercfg
       - FABRIC_LOGGING_SPEC=INFO

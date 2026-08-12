@@ -3,7 +3,17 @@
 Generated: 2026-06-06
 Status: regenerated from `scripts/run_full_grid.py`, `scripts/run_ablations.py`, `scripts/run_nspi_sensitivity.py`, `scripts/run_nspi_targeted_sensitivity.py`, `scripts/run_explanation_audit_quality.py`, `scripts/run_workload_policy_stress.py`, and `scripts/run_seed_confidence_summary.py` over seeds `{7, 21, 42, 99, 123}`. The workload/policy-mix stress arm now also uses the same five-seed set.
 
-These findings define what the SEBA-XAI paper can honestly claim.
+**Scope of this document.** Everything below comes from the **earlier synthetic
+simulation study** in `src/seba/`, not from the implemented system. The system —
+a running five-organisation Hyperledger Fabric network where the authorisation
+decision is the endorsed on-chain computation — lives in
+`seba_fabric_workspace/crime-records-network/`, and its measurements are
+recorded separately in `crime-records-network/docs/evaluation.md`.
+
+The two evidence bases must never be merged in a claim. They were produced by
+different artifacts under different assumptions. See `CONTRIBUTION.md` §4.
+
+These findings define what the simulation study can honestly support.
 
 ## 1. Overall AAS By Defense
 
@@ -170,9 +180,24 @@ in the repository.
 
 ## 7. What This Means For The Paper
 
-The paper should now be framed as:
+These results are the **simulation-study evidence** supporting one specific
+claim of the paper: that integrity and correctness are separate properties of an
+audit trail. They should be presented as a controlled demonstration of that
+separation, under stated visibility assumptions, and never as evidence about the
+implemented system's behaviour.
 
-> A secure explainable access-governance overlay where blockchain-style audit and ABAC/PBAC enforce ordinary integrity and policy checks, trusted raw-attribute policy re-evaluation provides the strongest audit baseline when available, and NS-PI adds explainable log-only policy-drift monitoring for validly re-signed compromised-signer failures.
+The role of this study in the paper is therefore:
+
+> A controlled adversarial benchmark showing that defences which verify whether
+> a log was *altered* cannot detect corruption that entered before signing,
+> while defences that re-examine the *decisions* can — with each defence's
+> detection ability determined by what the reviewer is assumed to see. Detection
+> ability is a function of visibility, not of cryptographic strength.
+
+The system-level counterpart of this result — that endorsement consensus
+establishes agreement on a transaction but not the integrity of its premises —
+is analytical and is stated in `CONTRIBUTION.md` §5. It has not been replayed
+against the live network, and the two must be reported as distinct.
 
 The paper should **not** say:
 
@@ -195,13 +220,29 @@ The paper should **not** say:
 
 ## 9. Research Decision
 
-The solid first-paper direction is no longer "AI + blockchain + police data" in a broad way.
+The paper's subject is the **implemented system**: a permissioned-blockchain
+system for inter-agency criminal-justice record access in which the
+authorisation decision is the endorsed on-chain computation, subject attributes
+are bound to issued certificates, and the justification for each decision is
+committed atomically alongside it.
 
-The solid direction is:
+This simulation study is not the contribution. It is supporting evidence for one
+of the system's claims — that a tamper-evidence check cannot establish decision
+correctness — obtained under controlled conditions that the live network cannot
+currently reproduce, because doing so there requires modelling a compromised
+certificate authority.
 
-> **SEBA-XAI as a benchmarked architecture for explainable policy-drift detection and trusted policy re-evaluation in blockchain-audited police access governance.**
+Stated as a division of labour:
 
-This is narrower, measurable, and supported by current repository evidence.
+| Question | Answered by | Status |
+|---|---|---|
+| Can authorisation run as an endorsed on-chain computation, and at what cost? | the system | measured |
+| Does certificate-bound attribute handling remove requester-asserted authority? | the system | implemented and tested |
+| Can a reviewer independently verify a decision's grounds? | the system | measured |
+| Can integrity checking miss an incorrect decision, and by how much? | this study | measured |
+| Does the same gap exist under real endorsement? | the system | analytical only |
+
+The last row is the most important open item in the project.
 
 ## 10. Verification Commands
 

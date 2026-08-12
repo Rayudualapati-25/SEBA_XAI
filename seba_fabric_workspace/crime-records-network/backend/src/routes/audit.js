@@ -1,12 +1,9 @@
 'use strict';
 
 const express = require('express');
-const crypto = require('crypto');
 const { z } = require('zod');
-const db = require('../db');
 const fabric = require('../fabric/gateway');
-const accessLog = require('../audit/accessLog');
-const anchor = require('../audit/anchor');
+const vault = require('../storage/vault');
 const { ok, fail, asyncRoute } = require('../util/respond');
 const { requireAuth, requireRole } = require('../middleware/auth');
 
@@ -25,62 +22,46 @@ router.get('/trail/:recordId', requireRole(...REVIEWER_ROLES), asyncRoute(async 
 }));
 
 /**
- * Verify the off-chain payload against the on-chain commitment. The hash is
- * recomputed here over what the store actually holds right now — if anyone
- * edited the database, this is where it shows.
+ * Recompute the agency-held raw-content hash and compare it with Fabric's
+ * immutable metadata commitment.
  */
 router.post('/verify-payload/:recordId', requireRole(...REVIEWER_ROLES),
   asyncRoute(async (req, res) => {
-    const row = db.getPayload(req.params.recordId);
-    if (!row) return fail(res, 'payload not found in off-chain store', 404);
-    const currentHash = crypto.createHash('sha256').update(row.payload, 'utf8').digest('hex');
+    const record = await fabric.evaluate(
+      req.user.org, req.user.fabricUser, 'RecordContract', 'GetRecord',
+      req.params.recordId);
+    const stored = vault.read(record.offChainReference);
     const result = await fabric.evaluate(
       req.user.org, req.user.fabricUser, 'AuditContract', 'VerifyRecordPayload',
-      req.params.recordId, currentHash);
+      req.params.recordId, stored.currentHash);
     return ok(res, { ...result, verifiedAt: new Date().toISOString() });
   }));
 
 /**
- * The access log: who searched, who read a record, who was handed a case file.
- * These are Fabric queries, so they never appear on the ledger by themselves —
- * this log plus its on-chain anchors is what makes them auditable.
+ * Direct Fabric access events: who searched, read or received a case file.
  */
 router.get('/access-log', requireRole(...REVIEWER_ROLES), asyncRoute(async (req, res) => {
   const limit = Math.min(Number(req.query.limit) || 50, 500);
-  const entries = db.getRecentAccessLogEntries(limit);
-  const state = db.getAnchorState();
+  const entries = await fabric.evaluate(
+    req.user.org, req.user.fabricUser, 'AuditContract', 'QueryAccessEvents', String(limit));
   return ok(res, {
     entries,
-    anchoredUpto: state.anchored_upto,
-    anchoredAt: state.anchored_at,
-    pendingAnchor: anchor.pendingCount(),
+    storage: 'fabric-ledger',
+    integrity: 'validated by Fabric block history and endorsement',
   });
 }));
 
-/**
- * Recompute the whole hash chain and compare it with every anchor on the
- * blockchain. This is the check that catches an edited or deleted log entry.
- */
+/** Report the integrity mechanism now that no external log needs anchoring. */
 router.get('/access-log/verify', requireRole(...REVIEWER_ROLES), asyncRoute(async (req, res) => {
-  let anchors = [];
-  let anchorError = null;
-  try {
-    anchors = await anchor.fetchAnchors(req.user.org, req.user.fabricUser);
-  } catch (err) {
-    // Report this rather than silently verifying against nothing — an
-    // unreachable ledger means the strongest part of the check did not run.
-    anchorError = err.message;
-  }
-  const state = db.getAnchorState();
-  const result = accessLog.verifyChain(db, anchors || [], state.epoch);
-  return ok(res, { ...result, anchorError, verifiedAt: new Date().toISOString() });
-}));
-
-/** Force an anchor now instead of waiting for the batch threshold. */
-router.post('/anchor', requireRole('auditor', 'ombudsman'), asyncRoute(async (req, res) => {
-  const written = await anchor.anchorNow({ force: true });
-  if (!written) return ok(res, { anchored: false, reason: 'nothing new to anchor' });
-  return ok(res, { anchored: true, anchor: written });
+  const entries = await fabric.evaluate(
+    req.user.org, req.user.fabricUser, 'AuditContract', 'QueryAccessEvents', '500');
+  return ok(res, {
+    ok: true,
+    entriesChecked: entries.length,
+    storage: 'fabric-ledger',
+    mechanism: 'Fabric endorsement, ordering, block hashes, and immutable key history',
+    verifiedAt: new Date().toISOString(),
+  });
 }));
 
 const explanationSchema = z.object({ artifact: z.record(z.unknown()) });
